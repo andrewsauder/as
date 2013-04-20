@@ -97,9 +97,7 @@ DocProject/Help/html
 publish
 
 # Others
-[Bb]in
 [Oo]bj
-sql
 TestResults
 *.Cache
 ClientBin
@@ -139,10 +137,7 @@ Desktop.ini
 dist
 build
 eggs
-parts
-bin
-var
-sdist
+partssdist
 develop-eggs
 .installed.cfg
 
