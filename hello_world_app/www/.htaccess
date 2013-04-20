@@ -1,0 +1,57 @@
+
+
+RewriteEngine On
+
+
+##############################################
+# Prevents index.php from being re-processed
+
+RewriteRule ^(\bindex\.php\b) index.php   [QSA,L]
+
+
+####################
+# RULE PASS THROUGH 
+#<rule name="Pass Through" stopProcessing="true">
+#  <match url="^(m)?/?(resources|script|theme|ckeditor|plugins|projects|error.php)/?(.+)?" />
+#  <action type="Rewrite" url="{R:2}/{R:3}?through=true&amp;mobile={R:1}" />
+#</rule>
+
+RewriteRule   ^(\berror.php\b)$    $1?through=true    [NC,QSA,L]    # PASS THROUGH
+RewriteRule   ^(m)?/?(resources|script|theme|ckeditor|plugins|projects)/?(.+)? $2/$3?through=true&mobile=$1 [NC,QSA,L]
+
+
+####################
+# RULE MOBILE 
+#<rule name="Mobile" stopProcessing="true">
+#  <match url="^m/?([a-zA-Z0-9-_\.]+)?/?([a-zA-Z0-9-_\.]+)?/?([a-zA-Z0-9-_\.]+)?/?([a-zA-Z0-9-_\.]+)?/?([a-zA-Z0-9-_\.]+)?/?" />
+#  <action type="Rewrite" url="/index.php?mobile=true&amp;R1={R:1}&amp;R2={R:2}&amp;R3={R:3}&amp;R4={R:4}&amp;R5={R:5}" />
+#</rule>
+
+RewriteRule  ^m/?([a-zA-Z0-9-_\.]+)?/?([a-zA-Z0-9-_\.]+)?/?([a-zA-Z0-9-_\.]+)?/?([a-zA-Z0-9-_\.]+)?/?([a-zA-Z0-9-_\.]+)?/? index.php?mobile=true&R1=$1&R2=$2&R3=$3&R4=$4&R5=$5 [NC,QSA,L]
+
+
+####################
+# RULE XML 
+#<rule name="XML" stopProcessing="true">
+#  <match url="^xml/([a-zA-Z0-9-_]+)?/?([a-zA-Z0-9-_]+)?/?([a-zA-Z0-9-_]+)?/?([a-zA-Z0-9-_]+)?/?([a-zA-Z0-9-_]+)?/?" />
+#  <action type="Rewrite" url="index.php?XML=true&amp;R1={R:1}&amp;R2={R:2}&amp;R3={R:3}&amp;R4={R:4}&amp;R5={R:5}" />
+#</rule>
+
+RewriteRule ^/xml/([a-zA-Z0-9-_]+)?/?([a-zA-Z0-9-_]+)?/?([a-zA-Z0-9-_]+)?/?([a-zA-Z0-9-_]+)?/?([a-zA-Z0-9-_]+)?/? index.php?XML=true&R1=$1&R2=$2&R3=$3&R4=$4&R5=$5 [NC,QSA,L]
+
+
+####################
+# RULE DESKTOP 
+#<rule name="Desktop" stopProcessing="true">
+#  <match url="^([a-zA-Z0-9-_][a-zA-Z0-9-_\.]+)/?([a-zA-Z0-9-_\.]+)?/?([a-zA-Z0-9-_\.]+)?/?([a-zA-Z0-9-_\.]+)?/?([a-zA-Z0-9-_\.]+)?/?" />
+#  <action type="Rewrite" url="/index.php?mobile=false&amp;R1={R:1}&amp;R2={R:2}&amp;R3={R:3}&amp;R4={R:4}&amp;R5={R:5}" />
+#</rule>
+
+RewriteRule   ^([a-zA-Z0-9-_][a-zA-Z0-9-_\.]+)/?([a-zA-Z0-9-_\.]+)?/?([a-zA-Z0-9-_\.]+)?/?([a-zA-Z0-9-_\.]+)?/?([a-zA-Z0-9-_\.]+)?/? index.php?R1=$1&R2=$2&R3=$3&R4=$4&R5=$5    [NC,QSA,L]    # DESKTOP
+
+
+#############################################################
+# Suppress E_NOTICE same as (E_ERROR | E_WARNING | E_PARSE)
+
+php_value error_reporting 7
+

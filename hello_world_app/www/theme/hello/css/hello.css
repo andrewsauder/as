@@ -1,0 +1,10 @@
+html, body {
+	font-family:Helvetica, Arial, sans-serif;
+	font-size:14px;
+	line-height:20px;
+	color:#545454;
+}
+
+#body-container {
+	padding:20px;
+}

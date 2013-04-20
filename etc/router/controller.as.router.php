@@ -1,6 +1,8 @@
 <?php
 class ASrouterController {
 
+	private $sid;
+
 	function __construct( ) {
 
 	}
@@ -27,6 +29,8 @@ class ASrouterController {
 		else {
 			$controllerInfo = array( 'sid'=>'error', 'params'=>array('error'=>'404 Not Found'));
 		}
+
+		$this->sid = $controllerInfo['sid'];
 
 		$controller = $this->loadController( $controllerInfo['sid'], $controllerInfo['params'] );
 		return $controller;
@@ -69,7 +73,7 @@ class ASrouterController {
 		$showHeader		= $controller->includeHeader();
 		$showFooter		= $controller->includeFooter();
 
-		$body			= $controller->view();
+		$viewAndVars	= $controller->view();
 		$title 			= $controller->getPageTitle();
 		$keywords		= $controller->getPageKeywords();
 
@@ -99,6 +103,8 @@ class ASrouterController {
 			$showFooter = 	$controller->includeFooter();
 		}
 
+
+
 		ob_start();
 			include(getThemePath('/templates/'.$templateFilePrepend.'template.wrapper.php'));
 			$html = ob_get_contents();
@@ -106,6 +112,23 @@ class ASrouterController {
 
 		return $html;
 
+	}
+
+	private function getBody( $viewAndVars ) {
+
+		if(isset($viewAndVars['vars'])) {
+			//make view variables local scope and accessible by the key
+			foreach($viewAndVars['vars'] as $varName=>$varValue) {
+				$$varName = $varValue;
+			}
+		}
+
+		ob_start();
+			include(getThemePath('/'.$this->sid.'/'.$viewAndVars['view']));
+			$body = ob_get_contents();
+		ob_end_clean();
+
+		return $body;
 	}
 
 }

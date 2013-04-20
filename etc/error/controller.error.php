@@ -22,14 +22,7 @@ class errorController {
 			$file = 'view.generic';
 		}
 
-		ob_start();
-
-			include(view(AS__PATH.'/etc/error/views/'.$file.'.php'));
-			$body = ob_get_contents();
-
-		ob_end_clean();
-
-		return $body;
+		return array('view'=>'views/'.$file);
 	}
 
 	public function getPageTitle() {
