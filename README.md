@@ -2,7 +2,7 @@
 
 ## History
 
-AS is a PHP framework developed by Sauder Software, LLC in conjunction with resources from the goverment of Garrett County, Maryland, USA. AS builds out the standard PHP toolbox to enable rapid application development with extreme flexibility, scalability, and dynamism.
+AS is a PHP framework developed by Sauder Software, LLC in conjunction with the goverment of Garrett County, Maryland, USA. AS builds out the standard PHP toolbox to enable rapid application development with extreme flexibility, scalability, and dynamism.
 
 ## Requirements
 
@@ -10,4 +10,4 @@ AS is a PHP framework developed by Sauder Software, LLC in conjunction with reso
 
 ## Implementation
 
-* **Implenentation documentation to come**
+**Implenentation documentation to come**
