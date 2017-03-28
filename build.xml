@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project name="phingtest" default="dist" basedir="C:\inetpub\www\phingtest">
+
+    <!-- ============================================  -->
+    <!-- Target: prepare                               -->
+    <!-- ============================================  -->
+    <target name="prepare">
+        <echo msg="Making directory ./build" />
+        <mkdir dir="./build" />
+    </target>
+
+    <!-- ============================================  -->
+    <!-- Target: clean                               -->
+    <!-- ============================================  -->
+    <target name="clean" depends="prepare">
+        <echo msg="Resetting build directory" />
+        <delete dir="./build" />
+    </target>
+
+    <!-- ============================================  -->
+    <!-- Target: version                               -->
+    <!-- ============================================  -->
+    <target name="version">
+		<echo msg="Generating version number..." />
+		<version releasetype="Minor" file="./src/version.txt" property="version.number" />
+    </target>
+
+    <!-- ============================================  -->
+    <!-- Target: build                                 -->
+    <!-- Requires:                                     -->
+    <!--	- npm install -g minify-all                -->
+    <!--	- pingo image optimizer	                   -->
+    <!-- ============================================  -->
+    <target name="build" depends="prepare,version">
+
+        <echo msg="Copying files to build directory..." />
+		<copy todir="./build" >
+			<fileset dir="./src">
+				<include name="**" />
+				<exclude name="**/.svn/**" />
+			</fileset>
+		</copy>
+
+		<echo msg="Minifying JS in build..." />
+		<exec command="minify-all build/ yui-js" dir="./" />
+
+		<echo msg="Optimizing images in build..." />
+		<exec command="C:\Assets\Programs\pingo.exe -s4 build" dir="./" />
+
+    </target>
+
+
+
+</project>
