@@ -1,4 +1,6 @@
 <?php
+namespace andrewsauder\asframework;
+
 class ASsessionController {
 
 	public static function startApp() {

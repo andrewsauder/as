@@ -1,4 +1,7 @@
 <?php
+namespace andrewsauder\asframework;
+require_once('../../vendor/autoload.php');
+
 class ASloader {
 
 	function __construct() {
@@ -56,8 +59,6 @@ class ASloader {
 	private function getRequiredFiles() {
 		$files = array();
 
-		$files[] = AS__PATH.'/libs/cachesys/cachesys.php';
-
 		$files[] = AS__PATH.'/opts/functions.php';
 		$files[] = AS__PATH.'/opts/tools.php';
 		$files[] = AS__PATH.'/opts/email.php';
@@ -114,7 +115,7 @@ class ASloader {
 			}
 
 			if(isset($_GET['cleancache'])) {
-				cacheSys::deleteAllCache();
+				\andrewsauder\cacheSys::deleteAllCache();
 			}
 
 	}

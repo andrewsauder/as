@@ -1,5 +1,5 @@
 <?php
-include_once(AS__PATH.'/libs/random_compat/random.php');
+namespace andrewsauder\asframework;
 
 function hasValue($var, $checkZero = false) {
 	if(!isset($var)) {

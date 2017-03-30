@@ -12,6 +12,8 @@
     ],
     "require": {
 		"php": "^5.4 || ^7.0",
-        "phpmailer/phpmailer": "5.*"
+        "phpmailer/phpmailer": "5.*",
+		"andrewsauder/cachesys": "1.*",
+		"paragonie/random_compat": "2.*"
     }
 }

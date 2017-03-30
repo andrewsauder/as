@@ -1,6 +1,4 @@
 <?php
-include_once(AS__PATH.'libs/PHPMailer_v5-2/class.phpmailer.php');
-include_once(AS__PATH.'libs/PHPMailer_v5-2/class.smtp.php');
 class email {
 
 	private static $from = '';

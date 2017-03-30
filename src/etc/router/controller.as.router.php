@@ -1,4 +1,8 @@
 <?php
+namespace andrewsauder\asframework;
+
+use andrewsauder;
+
 class ASrouterController {
 
 	private $sid;
@@ -84,8 +88,8 @@ class ASrouterController {
 
 			//if caching is allowed, we try to get the output from the cache and only if it doesn't exist do we run the resource expensive controller view()
 			if($allowCaching) {
-				$cacheKey = str_replace('?', '_',cacheSys::sanitizeKey($_SERVER['REQUEST_URI']));
-				$body	  = cacheSys::get( 'output', $cacheKey );
+				$cacheKey = str_replace('?', '_',\andrewsauder\cacheSys::sanitizeKey($_SERVER['REQUEST_URI']));
+				$body	  = \andrewsauder\cacheSys::get( 'output', $cacheKey );
 			}
 
 			//call local variables whether cache is real or not.
@@ -127,7 +131,7 @@ class ASrouterController {
 				}
 
 				if($allowCaching) {
-					cacheSys::put( 'output', $cacheKey, $body );
+					\andrewsauder\cacheSys::put( 'output', $cacheKey, $body );
 				}
 			}
 
