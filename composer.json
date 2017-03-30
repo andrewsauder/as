@@ -1,0 +1,19 @@
+{
+    "name": "andrewsauder/as",
+    "description": "AS is a PHP framework developed to extend the PHP toolbox to enable rapid application development with extreme flexibility, scalability, and dynamism.",
+	"homepage": "https://github.com/andrewsauder/as",
+    "license": "MIT",
+	 "authors": [
+        {
+            "name": "Andrew Sauder",
+            "email": "andrew@saudersoftware.com",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+		"php": "^5.4 || ^7.0",
+        "phpmailer/phpmailer": "5.*",
+		"andrewsauder/cachesys": "1.*",
+		"paragonie/random_compat": "2.*"
+    }
+}
