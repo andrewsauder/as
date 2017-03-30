@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<project name="phingtest" default="dist" basedir="C:\inetpub\www\phingtest">
+<project name="as" default="build" basedir="C:\inetpub\git\as">
 
     <!-- ============================================  -->
     <!-- Target: prepare                               -->
     <!-- ============================================  -->
     <target name="prepare">
-        <echo msg="Making directory ./build" />
-        <mkdir dir="./build" />
+        <echo msg="Making directory ./dist" />
+        <mkdir dir="./dist" />
     </target>
 
     <!-- ============================================  -->
@@ -15,7 +15,7 @@
     <!-- ============================================  -->
     <target name="clean" depends="prepare">
         <echo msg="Resetting build directory" />
-        <delete dir="./build" />
+        <delete dir="./dist" />
     </target>
 
     <!-- ============================================  -->
@@ -35,7 +35,7 @@
     <target name="build" depends="prepare,version">
 
         <echo msg="Copying files to build directory..." />
-		<copy todir="./build" >
+		<copy todir="./dist" >
 			<fileset dir="./src">
 				<include name="**" />
 				<exclude name="**/.svn/**" />

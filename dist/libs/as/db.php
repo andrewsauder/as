@@ -1,5 +1,4 @@
 <?php
-
 class db {
 
 	private $database, $connect, $pdo;
