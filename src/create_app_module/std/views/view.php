@@ -1,2 +1,0 @@
-<!-- html view to be included in the template.wrapper.php of your theme -->
-<!-- remember that values set in controller->view() $vars are available here as a local variable (ex controller $vars['employeeID'] is available as $employeeID here)

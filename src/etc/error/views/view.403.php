@@ -1,1 +1,0 @@
-<img src="images/error/403.jpg" style="width:100%;max-width:1280px;" alt="Access Denied" />
