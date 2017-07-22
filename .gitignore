@@ -13,21 +13,6 @@ Desktop.ini
 
 
 ############
-## Netbeans
+## Session files
 ############
-/nbproject/*
-
-
-
-############
-## IIS
-############
-/www/web.config
-
-
-
-############
-## AS
-############
-/cache/*
-/var/tmp/*
+/bin/*.as
