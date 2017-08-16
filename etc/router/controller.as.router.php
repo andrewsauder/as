@@ -64,6 +64,7 @@ class ASrouterController {
 		}
 
 		if(!isset($controller)) {
+			http_response_code(404);
 			$this->sid = 'error';
 			include_once(AS__PATH.'etc/error/controller.error.php');
 			$controller = new errorController( $controller_params );
