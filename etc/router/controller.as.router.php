@@ -40,7 +40,7 @@ class ASrouterController {
 	}
 
 	private function loadController( $controller_sid, $controller_params ) {
-		if($controller_sid!='') {
+		if($controller_sid!='' && $controller_sid!='error') {
 
 			if(file_exists(AS_APP_PATH.$controller_sid.'/model.'.$controller_sid.'.php')) {
 				include_once($controller_sid.'/model.'.$controller_sid.'.php');
@@ -64,7 +64,11 @@ class ASrouterController {
 		}
 
 		if(!isset($controller)) {
-			http_response_code(404);
+			if(!headers_sent()) {
+				if(http_response_code()==200 || http_response_code()==null) {
+					http_response_code(404);
+				}
+			}
 			$this->sid = 'error';
 			include_once(AS__PATH.'etc/error/controller.error.php');
 			$controller = new errorController( $controller_params );
