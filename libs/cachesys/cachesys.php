@@ -30,7 +30,7 @@ class cacheSys {
 
 		$content = false;
 
-		$fileName = AS_ROOT_PATH.'/cachecache/'.$cacheName.'.'.$key.'.cache';
+		$fileName = AS_ROOT_PATH.'/cache/'.$cacheName.'.'.$key.'.cache';
 
 		if($maxAge===false) {
 			if(file_exists($fileName)) {
@@ -75,7 +75,7 @@ class cacheSys {
 			error_log('Put output in cacheSys: '.$key);
 		}
 
-		$fileName = AS_ROOT_PATH.'/cachecache/'.$cacheName.'.'.$key.'.cache';
+		$fileName = AS_ROOT_PATH.'/cache/'.$cacheName.'.'.$key.'.cache';
 
 		$cached = fopen($fileName, 'w');
 
