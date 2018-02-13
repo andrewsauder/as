@@ -11,7 +11,7 @@ $EnvServerName = Read-Host "I.E. apps.garrettcounty.local"
 Write-host "DB to create users for" -ForegroundColor Yellow 
 $EnvDB = Read-Host "I.E. W_Timeclock" 
 
-[xml]$config = Get-Content config.xml
+[xml]$config = Get-Content ../var/config.xml
 
 foreach( $srv in $config.config.environment.local.srv) {
     echo 'create'
