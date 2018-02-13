@@ -1,22 +1,22 @@
 ﻿function createUser( $EnvServerName, $srv ) {
-    
+
     return false
 }
 
 
-Write-host "AS Environment Server Name" -ForegroundColor Yellow 
-$EnvServerName = Read-Host "I.E. apps.garrettcounty.local" 
+Write-host "AS Environment Server Name" -ForegroundColor Yellow
+$EnvServerName = Read-Host "I.E. apps.garrettcounty.local"
 
 
-Write-host "DB to create users for" -ForegroundColor Yellow 
-$EnvDB = Read-Host "I.E. W_Timeclock" 
+Write-host "DB to create users for" -ForegroundColor Yellow
+$EnvDB = Read-Host "I.E. W_Timeclock"
 
 [xml]$config = Get-Content ../var/config.xml
 
 foreach( $srv in $config.config.environment.local.srv) {
     echo 'create'
     if($EnvServerName -eq $srv.server_name) {
-        
+
         foreach( $db_connector in $srv.db_connector ) {
              if($db_connector.db -eq $EnvDB) {
                 Write-Host "Adding users for "$db_connector.db" on "$db_connector.server
@@ -26,6 +26,7 @@ foreach( $srv in $config.config.environment.local.srv) {
                 $writer = $db_connector.write.user
                 $readerpass = $db_connector.read.pass
                 $writerpass = $db_connector.write.pass
+                $SqlServer = $db_connector.server
 
                 $SqlQuery = "
                     USE [$db]
@@ -37,21 +38,21 @@ foreach( $srv in $config.config.environment.local.srv) {
 
                     USE [master]
 
-                    BEGIN TRY  
+                    BEGIN TRY
                          DROP LOGIN [$writer]
-                    END TRY  
-                    BEGIN CATCH  
-     
-                    END CATCH  
+                    END TRY
+                    BEGIN CATCH
+
+                    END CATCH
 
                     GO
 
-                    BEGIN TRY  
+                    BEGIN TRY
                          DROP LOGIN [$reader]
-                    END TRY  
-                    BEGIN CATCH  
-     
-                    END CATCH  
+                    END TRY
+                    BEGIN CATCH
+
+                    END CATCH
 
                     GO
                     CREATE LOGIN [$writer] WITH PASSWORD=N'$writerpass', DEFAULT_DATABASE=[W_Timeclock], DEFAULT_LANGUAGE=[us_english], CHECK_EXPIRATION=OFF, CHECK_POLICY=OFF
@@ -79,7 +80,7 @@ foreach( $srv in $config.config.environment.local.srv) {
              }
         }
 
-        
+
     }
     echo 'created'
 }
