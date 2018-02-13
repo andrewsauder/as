@@ -1,11 +1,13 @@
-﻿Write-host "SQL Table Name" -ForegroundColor Yellow 
+﻿Write-host "SQL Server" -ForegroundColor Yellow 
+$SqlServer = Read-Host "I.E. it-as\sqlexpress" 
+
+Write-host "SQL Database" -ForegroundColor Yellow 
+$SqlDatabase = Read-Host "I.E. W_Timeclock" 
+
+Write-host "SQL Table Name" -ForegroundColor Yellow 
 $SqlTable = Read-Host "I.E. customer" 
 
-$SqlServer = 'it-as\sqlexpress';
-$SqlDatabase = 'W_RMLV_PayrollCalc';
-#$SqlTable = 'customer';
-
-$modelFile = $SqlTable+'.php';
+$modelFile = '../models/'+$SqlTable+'.php';
 
 $SqlConnectionString = 'Data Source={0};Initial Catalog={1};Integrated Security=SSPI' -f $SqlServer, $SqlDatabase;
 $SqlQuery = "SELECT COLUMN_NAME, DATA_TYPE 
