@@ -36,27 +36,36 @@ class ASrouterController {
 		$this->sid = $controllerInfo['sid'];
 
 		$controller = $this->loadController( $controllerInfo['sid'], $controllerInfo['params'] );
+
 		return array('controller'=>$controller, 'router'=>$rt);
 	}
 
 	private function loadController( $controller_sid, $controller_params ) {
-		if($controller_sid!='' && $controller_sid!='error') {
+		if($controller_sid!='') {
 
-			if(file_exists(AS_APP_PATH.$controller_sid.'/model.'.$controller_sid.'.php')) {
-				include_once($controller_sid.'/model.'.$controller_sid.'.php');
+			$noterror = true;
+			if($controller_sid=='error' && !file_exists(AS_APP_PATH.$controller_sid.'/controller.'.$controller_sid.'.php')) {
+				$noterror = false;
+				error_log('Controller sid is equal to error and no error controller exists in app. Processing error using standard AS methods.');
 			}
 
-			if(file_exists(AS_APP_PATH.$controller_sid.'/controller.'.$controller_sid.'.php')) {
-				include_once($controller_sid.'/controller.'.$controller_sid.'.php');
-			}
+			if($noterror) {
+				if(file_exists(AS_APP_PATH.$controller_sid.'/model.'.$controller_sid.'.php')) {
+					include_once($controller_sid.'/model.'.$controller_sid.'.php');
+				}
 
-			$class = $controller_sid.'Controller';
+				if(file_exists(AS_APP_PATH.$controller_sid.'/controller.'.$controller_sid.'.php')) {
+					include_once($controller_sid.'/controller.'.$controller_sid.'.php');
+				}
 
-			if(class_exists($class)) {
-				$controller = new $class( $controller_params, $_GET, $_POST );
-			}
-			else {
-				error_log('Controller not found. Check controller name. ');
+				$class = $controller_sid.'Controller';
+
+				if(class_exists($class)) {
+					$controller = new $class( $controller_params, $_GET, $_POST );
+				}
+				else {
+					error_log('Controller not found. Check controller name. ');
+				}
 			}
 		}
 		else {
