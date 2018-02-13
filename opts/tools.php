@@ -570,6 +570,9 @@ class tools {
 			if(!isset($params['authentication']['basic']) || $params['authentication']['basic']!=true) {
 				curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_NTLM);
 			}
+			else {
+				curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
+			}
 			curl_setopt($ch, CURLOPT_USERPWD, $params['authentication']['user'].':'.$params['authentication']['password']);
 		}
 
