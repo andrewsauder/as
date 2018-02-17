@@ -92,7 +92,8 @@ function convertArrayToCSV($array, $header_row = true, $col_sep = ",", $row_sep 
 		$tmp = '';
 		//foreach ($val as $cell_key => $cell_val)
 		foreach($headers as $ik) {
-			$cell_val = str_replace($qut, "$qut$qut", $val[$ik]);
+			$thiscellval = isset($val[$ik]) ? $val[$ik] : '';
+			$cell_val = str_replace($qut, "$qut$qut", $thiscellval);
 			$tmp .= "$col_sep$qut$cell_val$qut";
 		}
 		$output .= substr($tmp, 1) . $row_sep;
@@ -213,6 +214,17 @@ function getXMLAsArray($src, $format = 'array') {
 	}
 }
 
+/**
+ *
+ * @param string $path Full path of directory to get files and directories from
+ * @param bool $returnSimple [optional] Default=false; Set to true for flat list of full file paths
+ * @param mixed $fileFilter  [optional] Default=null (no filter); Pass a string or string[] of three characters to get only files that use that extension (rather whose last three characters of extension matches)
+ * @param mixed $dirFilter [optional] Default=null (no filter); Pass a string or string[] of a name of a directory to only return directories with that name (files and subdirectories are not included unless $returnAncestorsOnFilter is set to true)
+ * @param bool $returnAncestorsOnFilter [optional] Default=false; Set to true to include the files and subdirectories of directories that match the $dirFilter in the response
+ * @param bool $stripLongFilePath [optional] Default=false; Set to true to remove part of the full file path in the response. $stripPath MUST BE PROVIDED if this is true.
+ * @param string $stripPath [optional] Default = ''; If $stripLongFilePath is true, you must provide a string that will be removed from the full file path in the response
+ * @return mixed[]
+ */
 function ls($path, $returnSimple = false, $fileFilter=null, $dirFilter=null, $returnAncestorsOnFilter=false, $stripLongFilePath=false, $stripPath='') {
 
 	$dir = array();
