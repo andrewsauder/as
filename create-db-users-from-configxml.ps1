@@ -26,6 +26,7 @@ foreach( $srv in $config.config.environment.local.srv) {
                 $writer = $db_connector.write.user
                 $readerpass = $db_connector.read.pass
                 $writerpass = $db_connector.write.pass
+                $SqlServer = $db_connector.server
 
                 $SqlQuery = "
                     USE [$db]
@@ -36,23 +37,7 @@ foreach( $srv in $config.config.environment.local.srv) {
 
 
                     USE [master]
-
-                    BEGIN TRY  
-                         DROP LOGIN [$writer]
-                    END TRY  
-                    BEGIN CATCH  
-     
-                    END CATCH  
-
-                    GO
-
-                    BEGIN TRY  
-                         DROP LOGIN [$reader]
-                    END TRY  
-                    BEGIN CATCH  
-     
-                    END CATCH  
-
+                    
                     GO
                     CREATE LOGIN [$writer] WITH PASSWORD=N'$writerpass', DEFAULT_DATABASE=[W_Timeclock], DEFAULT_LANGUAGE=[us_english], CHECK_EXPIRATION=OFF, CHECK_POLICY=OFF
                     GO
