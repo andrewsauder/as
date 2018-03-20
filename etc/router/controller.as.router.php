@@ -257,7 +257,7 @@ class ASrouterController {
 		}
 
 		if(isset($viewAndVars['data'])) {
-			if(is_array($viewAndVars['data'])) {
+			if(is_array($viewAndVars['data']) || is_object($viewAndVars['data'])) {
 				if(isset($_SESSION['AS']['config']['settings']['json_header']) && $_SESSION['AS']['config']['settings']['json_header']==1) {
 					header('Content-Type:application/json');
 				}
