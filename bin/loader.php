@@ -78,7 +78,9 @@ class ASloader {
 		else {
 			$url = explode('/', $_GET['R0']);
 			foreach($url as $i=>$urlKey) {
-				$_GET['R'.($i+1)] = $urlKey;
+				if(!isset($_GET['R'.($i+1)])) {
+					$_GET['R'.($i+1)] = $urlKey;
+				}
 			}
 		}
 
