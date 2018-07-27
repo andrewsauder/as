@@ -30,24 +30,23 @@ class ASloader {
 
 	private function startSession() {
 
-		$host = isset($_SERVER['SERVER_NAME']) ? strtolower($_SERVER['SERVER_NAME']) : 'cli';
-		$sessionFile = AS__PATH.'/bin/session-name.'.$host.'.as';
-		if(file_exists($sessionFile)) {
-			$sessionName = file_get_contents($sessionFile);
-		}
-		else {
-			$char_list = "ABCDEFGHIJKLMNPQRSTUVWXYZabcdefghijklmnpqrstuvwxyz123456789";
-			$random = '';
-			for($i = 0; $i < 50; $i++) {
-				$random .= substr($char_list, (rand() % (strlen($char_list))), 1);
-			}
-			$sessionName = $random;
-			file_put_contents($sessionFile, $sessionName);
-		}
-
-		session_name($sessionName);
-
 		if (session_status() == PHP_SESSION_NONE) {
+			$host = isset($_SERVER['SERVER_NAME']) ? strtolower($_SERVER['SERVER_NAME']) : 'cli';
+			$sessionFile = AS__PATH.'/bin/session-name.'.$host.'.as';
+			if(file_exists($sessionFile)) {
+				$sessionName = file_get_contents($sessionFile);
+			}
+			else {
+				$char_list = "ABCDEFGHIJKLMNPQRSTUVWXYZabcdefghijklmnpqrstuvwxyz123456789";
+				$random = '';
+				for($i = 0; $i < 50; $i++) {
+					$random .= substr($char_list, (rand() % (strlen($char_list))), 1);
+				}
+				$sessionName = $random;
+				file_put_contents($sessionFile, $sessionName);
+			}
+
+			session_name($sessionName);
 			session_start();
 		}
 
