@@ -45,6 +45,18 @@ $columns = New-Object System.Collections.Specialized.OrderedDictionary
             $dataType = 'string';
             $defaultValue = " = ''";
         }
+        elseif( $dataType -eq 'char' ) {
+            $dataType = 'string';
+            $defaultValue = " = ''";
+        }
+        elseif( $dataType -eq 'decimal' ) {
+            $dataType = 'float';
+            $defaultValue = "";
+        }
+        elseif( $dataType -eq 'smallint' ) {
+            $dataType = 'int';
+            $defaultValue = "";
+        }
         elseif( ($dataType -eq 'date') -Or ($dataType -eq "datetime")) {
             $dataType = '\DateTimeImmutable';
             $defaultValue = "";

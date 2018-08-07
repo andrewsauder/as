@@ -524,6 +524,12 @@ function areturn( $arr, $key, $boolean=false ) {
 	return $str;
 }
 
+/**
+ *
+ * @param string $num Phone number to format (ideally pass just digits, as it will strip out all others)
+ * @param string $divider Character to use to divide digit groups
+ * @return string
+ */
 function phone( $num, $divider='.' ) {
 	$num = preg_replace("/[^0-9]/", "", $num);
 	if(strlen($num)>0) {
