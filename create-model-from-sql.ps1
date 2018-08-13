@@ -27,7 +27,9 @@ $columns = New-Object System.Collections.Specialized.OrderedDictionary
     "<?php`nnamespace model;`n`nuse \db;`nuse \JsonSerializable;`n`nclass $SqlTable implements JsonSerializable {" | Set-Content $modelFile
     
     "`n`t/** @var \db */" | Add-Content $modelFile
+    Start-Sleep -Milliseconds 300
     "`tprivate `$db;" | Add-Content $modelFile
+    Start-Sleep -Milliseconds 300
 
 
 #Add public variables
@@ -63,8 +65,9 @@ $columns = New-Object System.Collections.Specialized.OrderedDictionary
         }
     
         "`n`t/** @var "+$dataType+" */" | Add-Content $modelFile
+        Start-Sleep -Milliseconds 300
         "`tpublic $"+$SqlDataReader['COLUMN_NAME']+$defaultValue+";" | Add-Content $modelFile
-
+        Start-Sleep -Milliseconds 300
         $columns.Add($SqlDataReader['COLUMN_NAME'], $dataType );
 
     }
@@ -92,6 +95,7 @@ $columns = New-Object System.Collections.Specialized.OrderedDictionary
 
 			`$row = `$this->db->readOneRow( `$q, [ 'id'=>`$id ]);
 " | Add-Content $modelFile
+Start-Sleep -Milliseconds 300
 
 foreach($column in $columns.GetEnumerator()) {
     $value = "("+$column.Value+") `$row['"+$column.Name+"']";
@@ -104,6 +108,7 @@ foreach($column in $columns.GetEnumerator()) {
     }
 
     "`t`t`t`$this->"+$column.Name+" = "+$value+";"  | Add-Content $modelFile
+    Start-Sleep -Milliseconds 300
 }
 
 
@@ -111,6 +116,7 @@ foreach($column in $columns.GetEnumerator()) {
 		}
 
 	}" | Add-Content $modelFile
+Start-Sleep -Milliseconds 300
 
 
 
@@ -135,6 +141,7 @@ $params = "";
 foreach($column in $columns.GetEnumerator()) {
 
     "`t`t`t'"+$column.Name+"' => `$this->"+$column.Name+","  | Add-Content $modelFile
+    Start-Sleep -Milliseconds 300
 
     if( $column.Name -ne 'id' ) {
         if($params -ne "") {
@@ -155,6 +162,7 @@ foreach($column in $columns.GetEnumerator()) {
 		return true;
 
 	}" | Add-Content $modelFile
+Start-Sleep -Milliseconds 300
 
 
 
@@ -179,6 +187,7 @@ foreach($column in $columns.GetEnumerator()) {
 
     if( $column.Name -ne 'id' ) {
         "`t`t`t'"+$column.Name+"' => `$this->"+$column.Name+","  | Add-Content $modelFile
+        Start-Sleep -Milliseconds 300
 
         if($insertColumnParams -ne "") {
             $insertColumnParams+=", ";
@@ -202,6 +211,7 @@ foreach($column in $columns.GetEnumerator()) {
 		return true;
 
 	}" | Add-Content $modelFile
+Start-Sleep -Milliseconds 300
 
 
 #delete
@@ -227,6 +237,7 @@ foreach($column in $columns.GetEnumerator()) {
 
 }
 " | Add-Content $modelFile
+Start-Sleep -Milliseconds 300
 
 
 #Init
@@ -248,11 +259,13 @@ foreach($column in $columns.GetEnumerator()) {
 		}
 
 " | Add-Content $modelFile
+Start-Sleep -Milliseconds 300
 
 foreach($column in $columns.GetEnumerator()) {
     
     if( $column.Value -eq "\DateTimeImmutable") {
         "`t`t`t`$this->"+$column.Name+" = !empty( `$this->"+$column.Name+" ) ? new \DateTimeImmutable( `$this->"+$column.Name+" ) : null;"  | Add-Content $modelFile
+        Start-Sleep -Milliseconds 300
     }    
     #"`t`t`t`$this->"+$column.Name+" = $"+$SqlTable+"Object->"+$column.Name+";" | Add-Content $modelFile
 
@@ -268,6 +281,7 @@ foreach($column in $columns.GetEnumerator()) {
 
 	public function jsonSerialize() {
 " | Add-Content $modelFile
+Start-Sleep -Milliseconds 300
 
 foreach($column in $columns.GetEnumerator()) {
 
@@ -277,8 +291,10 @@ foreach($column in $columns.GetEnumerator()) {
 
 }
 "`t`t`treturn `$this;" | Add-Content $modelFile
+Start-Sleep -Milliseconds 300
 
 "	}"  | Add-Content $modelFile
+Start-Sleep -Milliseconds 300
 
 
 
