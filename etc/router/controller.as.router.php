@@ -257,10 +257,10 @@ class ASrouterController {
 		}
 
 		if(isset($viewAndVars['data'])) {
+			if(isset($_SESSION['AS']['config']['settings']['json_header']) && $_SESSION['AS']['config']['settings']['json_header']==1) {
+				header('Content-Type:application/json');
+			}
 			if(is_array($viewAndVars['data']) || is_object($viewAndVars['data'])) {
-				if(isset($_SESSION['AS']['config']['settings']['json_header']) && $_SESSION['AS']['config']['settings']['json_header']==1) {
-					header('Content-Type:application/json');
-				}
 				$d = json_encode($viewAndVars['data']);
 			}
 			else {

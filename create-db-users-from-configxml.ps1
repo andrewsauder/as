@@ -35,7 +35,6 @@ foreach( $srv in $config.config.environment.local.srv) {
                     DROP USER IF EXISTS [$reader]
                     GO
 
-
                     USE [master]
 
                     BEGIN TRY
