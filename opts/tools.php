@@ -513,7 +513,10 @@ class tools {
 			$params['fields'] = [];
 		}
 
-		if(is_array($params['fields'])) {
+		if(is_array($params['fields']) && count($params['fields'])==0) {
+			$fields_string = '';
+		}
+		elseif(is_array($params['fields'])) {
 			$fields_string = http_build_query($params['fields']);
 		}
 		elseif(is_string($params['fields'])) {
@@ -539,7 +542,9 @@ class tools {
 				curl_setopt($ch, CURLOPT_POSTFIELDS, $fields_string);
 			}
 			elseif(strtolower($params['method'])=='get') {
-				curl_setopt($ch, CURLOPT_URL, $params['url'].'?'.$fields_string);
+				if(strlen($fields_string)>0 ) {
+					curl_setopt($ch, CURLOPT_URL, $params['url'].'?'.$fields_string);
+				}
 			}
 			elseif(strtolower($params['method'])=='put') {
 				curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'PUT');
