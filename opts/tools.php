@@ -553,7 +553,9 @@ class tools {
 			}
 			elseif(strtolower($params['method'])=='delete') {
 				curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'DELETE');
-				curl_setopt($ch, CURLOPT_POSTFIELDS, $fields_string);
+				if(strlen($fields_string)>0 ) {
+					curl_setopt($ch, CURLOPT_POSTFIELDS, $fields_string);
+				}
 			}
 		}
 		//assume post for legacy
