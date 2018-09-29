@@ -1,4 +1,9 @@
 <?php
+if( file_exists( AS_ROOT_PATH . '/vendor/autoload.php' )) {
+	include_once(AS_ROOT_PATH . '/vendor/autoload.php');
+}
+include_once(AS__PATH . '/as.autoloader.php');
+
 class ASsessionController {
 
 	public static function startApp() {
