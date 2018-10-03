@@ -631,7 +631,7 @@ class tools {
 		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 
 		if(isset($params['type'])) {
-			curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "PUT");
+			curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $params['type']);
 		}
 		else {
 			curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
