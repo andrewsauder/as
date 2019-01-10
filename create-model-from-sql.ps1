@@ -55,6 +55,14 @@ $columns = New-Object System.Collections.Specialized.OrderedDictionary
             $dataType = 'float';
             $defaultValue = "";
         }
+        elseif( $dataType -eq 'money' ) {
+            $dataType = 'float';
+            $defaultValue = "";
+        }
+        elseif( $dataType -eq 'real' ) {
+            $dataType = 'float';
+            $defaultValue = "";
+        }
         elseif( $dataType -eq 'smallint' ) {
             $dataType = 'int';
             $defaultValue = "";
@@ -94,6 +102,8 @@ $columns = New-Object System.Collections.Specialized.OrderedDictionary
 			`$q = `"SELECT * FROM [$SqlTable] WHERE id=:id;`";
 
 			`$row = `$this->db->readOneRow( `$q, [ 'id'=>`$id ]);
+
+            if(count(`$row)>0) {
 " | Add-Content $modelFile
 Start-Sleep -Milliseconds 300
 
@@ -113,6 +123,7 @@ foreach($column in $columns.GetEnumerator()) {
 
 
 "
+            }
 		}
 
 	}" | Add-Content $modelFile
