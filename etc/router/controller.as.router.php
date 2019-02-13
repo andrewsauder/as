@@ -1,4 +1,5 @@
 <?php
+include_once('advanced_controller_router.php');
 class ASrouterController {
 
 	private $sid;
@@ -127,7 +128,15 @@ class ASrouterController {
 
 				}
 				else {
-					$viewAndVars	= $controller->view();
+					if(isset($_SESSION['AS']['config']['settings']['advanced_controller_routing']) && $_SESSION['AS']['config']['settings']['advanced_controller_routing']==1) {
+
+						$router = new ASAdvancedControllerRouter( $controller );
+						$viewAndVars = $router->get();
+
+					}
+					else {
+						$viewAndVars	= $controller->view();
+					}
 				}
 
 
