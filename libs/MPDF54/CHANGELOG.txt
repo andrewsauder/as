@@ -36,7 +36,7 @@ Moved: Numerous $form_.. variables are now in /classes/form.php
 
 New config variables 
 --------------------
-$this->bookmarkStyles = array();
+$this->bookmarkStyles = [];
 $this->cacheTables = true;
 	
 New methods
@@ -127,15 +127,15 @@ $attr['REPEAT_HEADER'] == true		CSS removed / depracated
 $this->usepre=true; removed / depracated as never needed - always respects PRE whitespace
 
 ToC: NB Values can no longer be set directly e.g. as in example
-	$mpdf->TOCheader = array();	// array as for setting header/footer
-	$mpdf->TOCfooter = array();	// array as for setting header/footer
+	$mpdf->TOCheader = [];	// array as for setting header/footer
+	$mpdf->TOCfooter = [];	// array as for setting header/footer
 	$mpdf->TOCpreHTML = '<h2>Contents - Portrait</h2>';	// HTML text to appear before table of contents
 	$mpdf->TOCpostHTML = '';	// HTML text to appear after table of contents
 	$mpdf->TOCbookmarkText = 'Content list';	// Text as it will appear in the Bookmarks (leave blank for none)
 Need to use TOCpagebreak either direct (or array version) or as HTML
 OR if absolutley necessary, could use:
-	$mpdf->tocontents->TOCheader = array();	// array as for setting header/footer
-	$mpdf->tocontents->TOCfooter = array();	// array as for setting header/footer
+	$mpdf->tocontents->TOCheader = [];	// array as for setting header/footer
+	$mpdf->tocontents->TOCfooter = [];	// array as for setting header/footer
 	$mpdf->tocontents->TOCpreHTML = '<h2>Contents - Portrait</h2>';	// HTML text to appear before table of contents
 	$mpdf->tocontents->TOCpostHTML = '';	// HTML text to appear after table of contents
 	$mpdf->tocontents->TOCbookmarkText = 'Content list';	// Text as it will appear in the Bookmarks (leave blank for none)
@@ -265,7 +265,7 @@ Column sums
 -----------
 (Also changed some preg_replace to str_replace to improve performance)
 To use: just add {colsum} to any cells of the table footer <tfoot>
-Add a number to specify a fixed number of decimal points e.g. <td>£{colsum2}</td>  will give you £123.40
+Add a number to specify a fixed number of decimal points e.g. <td>ï¿½{colsum2}</td>  will give you ï¿½123.40
 The width of the column will be calculated using the actual string {colsum} as a placeholder.
 If you need the column to be wider, use underscores "_" to pad it e.g. {colsum2_____}
 

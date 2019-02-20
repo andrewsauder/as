@@ -143,7 +143,7 @@ function GetLangOpts($llcc, $adobeCJK) {
 	}
 
 
-	$unifonts_arr = array();
+	$unifonts_arr = [];
 	if ($unifonts) {
 		$unifonts_arr = preg_split('/\s*,\s*/',$unifonts);
 	}

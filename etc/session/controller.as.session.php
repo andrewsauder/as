@@ -95,7 +95,7 @@ class ASsessionController {
 								$db_connectors = array( $server['db_connector']['db'] => $server['db_connector'] );
 							}
 							else {
-								$db_connectors = array();
+								$db_connectors = [];
 								if(count($server['db_connector'])>0) {
 									foreach($server['db_connector'] as $db_connector) {
 										$db_connectors[ $db_connector['db'] ] = $db_connector;
@@ -143,7 +143,7 @@ class ASsessionController {
 
 	public static function setASVar() {
 		if(!isset($_SESSION['AS']['var'])) {
-			$_SESSION['AS']['var'] = array();
+			$_SESSION['AS']['var'] = [];
 
 			$ASvar = ls(AS_VAR_PATH);
 

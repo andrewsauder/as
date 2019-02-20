@@ -15,7 +15,7 @@ $this->bookmarkStyles = array(
 	2 => array('color'=> array(0,128,0), 'style'=>'I'),
 );
 */
-$this->bookmarkStyles = array();
+$this->bookmarkStyles = [];
 
 // ACTIVE FORMS
 $this->useActiveForms = false;

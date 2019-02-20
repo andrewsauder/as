@@ -97,7 +97,7 @@ if ($mqr) { set_magic_quotes_runtime(0); }
 
 $l = file('mpdf_source.php');
 if (!count($l)) { die("ERROR - Could not find mpdf_source.php file in current directory"); }
-$exclflags = array();
+$exclflags = [];
 $x = '';
 
 	// Excluding 'HTML-CSS' will also exclude: 'TABLES', 'LISTS', 'TABLES-ADVANCED-BORDERS', 'HTMLHEADERS-FOOTERS', 'FORMS', 'BACKGROUNDS', 'CSS-FLOAT', 'CSS-IMAGE-FLOAT', 'CSS-POSITION', 'CSS-PAGE', 'BORDER-RADIUS'

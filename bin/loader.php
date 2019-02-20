@@ -56,7 +56,7 @@ class ASloader {
 	}
 
 	private function getRequiredFiles() {
-		$files = array();
+		$files = [];
 
 		$files[] = AS__PATH.'/libs/cachesys/cachesys.php';
 
@@ -108,7 +108,7 @@ class ASloader {
 
 		//CLEAN START
 			if(!isset($_SESSION['AS']) || isset($_GET['cleansession'])) {
-				$_SESSION['AS'] = array();
+				$_SESSION['AS'] = [];
 				$_SESSION['AS']['config'] = getXMLAsArray(AS_VAR_PATH."config.xml");
 				foreach($_SESSION['AS']['config']['environment'] as $environment=>$opts) {
 					if(isset($opts['srv']['server_name'])) {

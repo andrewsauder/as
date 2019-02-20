@@ -152,8 +152,8 @@ function print_graph($g,$pgwidth) {
 //	if ($type == 'xy' || $type=='scatter') { $colstart=0; }
 
 	// Get Data + Totals
-	$data = array();
-	$totals = array();
+	$data = [];
+	$totals = [];
 	for ($r=($rowbegin-1);$r<$rowend;$r++) {
 		for ($c=($colbegin-1);$c<$colend;$c++) {
 		    if (isset($g['data'][$r][$c])) { $g['data'][$r][$c] = floatval($g['data'][$r][$c] ); }
@@ -178,8 +178,8 @@ function print_graph($g,$pgwidth) {
 		}
 	}
 	// Get Legends and labels
-	$legends = array();
-	$labels = array();
+	$legends = [];
+	$labels = [];
 	$longestlegend = 0;
 	$longestlabel = 0;
 	if ($dataseries=='cols') { 
@@ -211,7 +211,7 @@ function print_graph($g,$pgwidth) {
 		}
 	}
    // Default sizes
-   $defsize = array();
+   $defsize = [];
    $defsize['pie'] = array('w' => 600, 'h' => 300);
    $defsize['pie3d'] = array('w' => 600, 'h' => 300);
    $defsize['radar'] = array('w' => 600, 'h' => 300);
@@ -392,9 +392,9 @@ function print_graph($g,$pgwidth) {
 			$graph->axis->SetFont(FF_USERFONT,FS_NORMAL,6*$k);
 			$graph->HideTickMarks(); 
 
-			$group = array();
+			$group = [];
 			foreach($data AS $series => $dat) { 
-				$rdata = array();
+				$rdata = [];
 				foreach($data[$series] AS $row) { $rdata[] = $row;  }
 				if (count($rdata)<3) { die("ERROR::Graph::Cannot create a Radar Plot with less than 3 data points."); }
 				// Create the radar plot
@@ -579,9 +579,9 @@ function print_graph($g,$pgwidth) {
 				$graph->xaxis->SetTitleMargin($xaxislblmargin*$k); 
 			}
 
-			$group = array();
+			$group = [];
 			foreach($data AS $series => $dat) { 
-				$rdata = array();
+				$rdata = [];
 				foreach($data[$series] AS $row) { $rdata[] = $row;  }
 
 				// Create the bar plot
@@ -664,9 +664,9 @@ function print_graph($g,$pgwidth) {
 				$graph->xaxis->SetTitleMargin($xaxislblmargin*$k); 
 				$graph->xaxis->SetTitle($xlabel,'middle');
 			}
-			$group = array();
+			$group = [];
 			foreach($data AS $series => $dat) { 
-				$rdata = array();
+				$rdata = [];
 				foreach($data[$series] AS $row) { $rdata[] = $row;  }
 				// Create the bar pot
 				$bplot = new BarPlot($rdata);
