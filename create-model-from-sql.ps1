@@ -87,11 +87,7 @@ $columns = New-Object System.Collections.Specialized.OrderedDictionary
 
 
 	/**
-	 * Get
-	 *
-	 * Initialize and set data by passing id. Exclude id to initialize empty.
-	 *
-	 * @param int `$id Id of court to get
+	 * @param int `$id
 	 */
 	public function __construct( `$id=null ) {
 
@@ -151,7 +147,13 @@ Start-Sleep -Milliseconds 300
 $params = "";
 foreach($column in $columns.GetEnumerator()) {
 
-    "`t`t`t'"+$column.Name+"' => `$this->"+$column.Name+","  | Add-Content $modelFile
+    if( $column.Value -eq "\DateTimeImmutable") {
+        "`t`t`t'"+$column.Name+"' => (`$this->"+$column.Name+" instanceof \DateTimeImmutable) ? `$this->"+$column.Name+"->format('Y-m-d') : `$this->"+$column.Name+","  | Add-Content $modelFile
+    }
+    else {
+        "`t`t`t'"+$column.Name+"' => `$this->"+$column.Name+","  | Add-Content $modelFile
+    }
+    #"`t`t`t'"+$column.Name+"' => `$this->"+$column.Name+","  | Add-Content $modelFile
     Start-Sleep -Milliseconds 300
 
     if( $column.Name -ne 'id' ) {
@@ -197,7 +199,14 @@ $insertValueParams = "";
 foreach($column in $columns.GetEnumerator()) {
 
     if( $column.Name -ne 'id' ) {
-        "`t`t`t'"+$column.Name+"' => `$this->"+$column.Name+","  | Add-Content $modelFile
+        
+        if( $column.Value -eq "\DateTimeImmutable") {
+            "`t`t`t'"+$column.Name+"' => (`$this->"+$column.Name+" instanceof \DateTimeImmutable) ? `$this->"+$column.Name+"->format('Y-m-d') : `$this->"+$column.Name+","  | Add-Content $modelFile
+        }
+        else {
+            "`t`t`t'"+$column.Name+"' => `$this->"+$column.Name+","  | Add-Content $modelFile
+        }
+        #"`t`t`t'"+$column.Name+"' => `$this->"+$column.Name+","  | Add-Content $modelFile
         Start-Sleep -Milliseconds 300
 
         if($insertColumnParams -ne "") {
