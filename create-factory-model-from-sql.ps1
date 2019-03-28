@@ -328,7 +328,7 @@ $columns = New-Object System.Collections.Specialized.OrderedDictionary
 
     
     #Open Class
-        "<?php`nnamespace model\$SqlTable;`n`n`nclass factory {" | Set-Content $factoryFile
+        "<?php`nnamespace model\$SqlTable;`n`nuse \db;`n`nclass factory {" | Set-Content $factoryFile
     
     #One
         "	/**
@@ -340,7 +340,7 @@ $columns = New-Object System.Collections.Specialized.OrderedDictionary
 
 		`$db = new db();
 
-		`$q = `"SELECT * FROM [admin] WHERE id=:id;`";
+		`$q = `"SELECT * FROM [$SqlTable] WHERE id=:id;`";
 
 		`$$SqlTable = `$db->readOneRow(`$q, [ 'id' => `$id ], '\model\$SqlTable');
 
