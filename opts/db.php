@@ -207,11 +207,17 @@ class db {
 			error_log('Query Failed: ' . $query);
 			error_log('Query Error Message: ' . $e->getMessage());
 
-			$result = [];
+			if($className===null) {
+				$result = [];
+			}
+			else {
+				$result = false;
+			}
 
 		}
 
-		if( $result===false ) {
+
+		if($className===null && $result===false) {
 			$result = [];
 		}
 
