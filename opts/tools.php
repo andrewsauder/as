@@ -602,9 +602,6 @@ class tools {
 			if($curl_errno) {
 				error_log('easyCURL error '.$curl_errno.' (http status '.$httpCode.') on url '.$params['url']);
 			}
-			else {
-				error_log('easyCURL success (http status '.$httpCode.') to url '.$params['url']);
-			}
 		}
 
 		//close connection
