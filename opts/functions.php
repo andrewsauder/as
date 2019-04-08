@@ -94,12 +94,17 @@ function convertArrayToCSV($array, $header_row = true, $col_sep = ",", $row_sep 
 		foreach($headers as $ik) {
 			$thiscellval = isset($val[$ik]) ? $val[$ik] : '';
 			$cell_val = str_replace($qut, "$qut$qut", $thiscellval);
-			$tmp .= "$col_sep$qut$cell_val$qut";
+			if(is_numeric($cell_val) || empty($cell_val)) {
+				$tmp .= "$col_sep$cell_val";
+			}
+			else {
+				$tmp .= "$col_sep$qut$cell_val$qut";
+			}
 		}
 		$output .= substr($tmp, 1) . $row_sep;
 	}
 
-	return $output;
+	return trim($output);
 }
 
 
