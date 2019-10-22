@@ -9,8 +9,12 @@ class cronMonitor {
 	/** @var string */
 	private $runId;
 
-	public function __construct( $jobId ) {
+	public function __construct( $jobId, $autoStart=true ) {
 		$this->jobId = $jobId;
+
+		if($autoStart) {
+			$this->start();
+		}
 	}
 
 	public function start() {
