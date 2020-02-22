@@ -38,6 +38,7 @@ class ASAdvancedControllerRouter {
 			http_response_code(404);
 			exit;
 		}
+
 	}
 
 	public function get() {
