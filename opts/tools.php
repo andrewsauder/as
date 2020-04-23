@@ -404,7 +404,7 @@ class tools {
 
 	public static function createCron( $script, $dataString='' ) {
 
-		$bat = '"'.$_SESSION[AS_APP]['environment']['phppath'].'" -f "'.$_SESSION[AS_APP]['environment']['cronpath'].$script.'.php" '.$_SESSION[AS_APP]['environment']['cli_server_name'].' '.$dataString;
+		$bat = $_SESSION[AS_APP]['environment']['phppath'].' -f "'.$_SESSION[AS_APP]['environment']['cronpath'].$script.'.php" '.$_SESSION[AS_APP]['environment']['cli_server_name'].' '.$dataString;
 		$bat .= "\n exit";
 
 		file_put_contents($_SESSION[AS_APP]['environment']['tmppath'].$script.'.bat', $bat);
