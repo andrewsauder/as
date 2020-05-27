@@ -34,22 +34,6 @@ class ASloader {
 	private function startSession() {
 
 		if (session_status() == PHP_SESSION_NONE) {
-			$host = isset($_SERVER['SERVER_NAME']) ? strtolower($_SERVER['SERVER_NAME']) : 'cli';
-			$sessionFile = AS__PATH.'/bin/session-name.'.$host.'.as';
-			if(file_exists($sessionFile)) {
-				$sessionName = file_get_contents($sessionFile);
-			}
-			else {
-				$char_list = "ABCDEFGHIJKLMNPQRSTUVWXYZabcdefghijklmnpqrstuvwxyz123456789";
-				$random = '';
-				for($i = 0; $i < 50; $i++) {
-					$random .= substr($char_list, (rand() % (strlen($char_list))), 1);
-				}
-				$sessionName = $random;
-				file_put_contents($sessionFile, $sessionName);
-			}
-
-			session_name($sessionName);
 			session_start();
 		}
 
@@ -58,9 +42,9 @@ class ASloader {
 	private function getRequiredFiles() {
 		$files = [];
 
-		$files[] = AS__PATH.'/libs/cachesys/cachesys.php';
 
 		$files[] = AS__PATH.'/opts/functions.php';
+		$files[] = AS__PATH.'/opts/cacheSys.php';
 		$files[] = AS__PATH.'/opts/tools.php';
 		$files[] = AS__PATH.'/opts/email.php';
 		$files[] = AS__PATH.'/opts/db.php';
@@ -109,7 +93,7 @@ class ASloader {
 		//CLEAN START
 			if(!isset($_SESSION['AS']) || isset($_GET['cleansession'])) {
 				$_SESSION['AS'] = [];
-				$_SESSION['AS']['config'] = getXMLAsArray(AS_VAR_PATH."config.xml");
+				$_SESSION['AS']['config'] = tools::getXMLAsArray(AS_VAR_PATH."config.xml");
 				foreach($_SESSION['AS']['config']['environment'] as $environment=>$opts) {
 					if(isset($opts['srv']['server_name'])) {
 						$_SESSION['AS']['config']['environment'][$environment]['srv'] = array($opts['srv']);

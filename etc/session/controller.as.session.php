@@ -145,7 +145,7 @@ class ASsessionController {
 		if(!isset($_SESSION['AS']['var'])) {
 			$_SESSION['AS']['var'] = [];
 
-			$ASvar = ls(AS_VAR_PATH);
+			$ASvar = tools::ls(AS_VAR_PATH);
 
 			foreach( $ASvar as $item ) {
 				if($item['type']=='dir') {

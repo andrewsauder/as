@@ -128,26 +128,13 @@ class ASrouterController {
 
 				}
 				else {
-					if(isset($_SESSION['AS']['config']['settings']['advanced_controller_routing']) && $_SESSION['AS']['config']['settings']['advanced_controller_routing']==1) {
-
-						$router = new ASAdvancedControllerRouter( $controller );
-						$viewAndVars = $router->get();
-
-					}
-					else {
-						$viewAndVars	= $controller->view();
-					}
+					$router = new ASAdvancedControllerRouter( $controller );
+					$viewAndVars = $router->get();
 				}
 
 
 				$body = $this->getBody($viewAndVars);
 
-				//encode emails
-				if(!isset($_SESSION['AS']['config']['settings']['encode_emails']) || $_SESSION['AS']['config']['settings']['encode_emails']==1) {
-					if(!isset($viewAndVars['data'])) {
-						$body = tools::encodeEmails( $body );
-					}
-				}
 
 				if($allowCaching) {
 					cacheSys::put( 'output', $cacheKey, $body );
@@ -266,9 +253,9 @@ class ASrouterController {
 		}
 
 		if(isset($viewAndVars['data'])) {
-			if(isset($_SESSION['AS']['config']['settings']['json_header']) && $_SESSION['AS']['config']['settings']['json_header']==1) {
-				header('Content-Type:application/json');
-			}
+
+			header('Content-Type:application/json');
+
 			if(is_array($viewAndVars['data']) || is_object($viewAndVars['data'])) {
 				$d = json_encode($viewAndVars['data']);
 			}
@@ -303,7 +290,7 @@ class ASrouterController {
 			}
 		}
 
-		$viewToInclude = view($path);
+		$viewToInclude = $this->view($path);
 
 		ob_start();
 			if(stream_resolve_include_path($viewToInclude)!==false) {
@@ -316,6 +303,46 @@ class ASrouterController {
 		ob_end_clean();
 
 		return $body;
+	}
+
+
+
+	private static function view( $path ) {
+
+		$path = trim($path, '/');
+
+		$parts = explode('/', $path);
+
+		$c = count($parts);
+
+		if($c>0) {
+
+			$ses = $_SESSION[AS_APP]['theme']['views'];
+
+			if(!isset($ses[$parts[0]])) {
+				return $path;
+			}
+
+			$dir = array();
+
+			foreach($parts as $i=>$v) {
+				if($v!='views' && $i<($c-1)) {
+					if(isset($ses[$v])) {
+						$ses = $ses[$v];
+						$dir[] = $v;
+					}
+				}
+			}
+
+			$fil = $parts[$c-1];
+
+			if( in_array( $fil, $ses ) ) {
+				return getThemePath('templates/'.implode('/',$dir) .'/'.$fil);
+			}
+
+		}
+
+		return $path;
 	}
 
 }
