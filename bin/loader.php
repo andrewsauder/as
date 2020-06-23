@@ -21,7 +21,7 @@ class ASloader {
 				define('AS_VAR_PATH', $wwwPath.'/../var/');
 				define('AS_LOG_PATH', $wwwPath.'/../logs/');
 				define('AS_CACHE_PATH', $wwwPath.'/../cache/');
-				define('AS_TMP_PATH', $wwwPath.'/../cache/');
+				define('AS_TMP_PATH', $wwwPath.'/../var/tmp/');
 				define('AS__PATH', $wwwPath.'/../AS/');
 			//APP DEFAULT INCLUDE PATH
 				set_include_path( AS_APP_PATH );
