@@ -1,5 +1,7 @@
 <?php
 
+namespace framework\helpers;
+
 
 class tools {
 

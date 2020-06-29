@@ -1,8 +1,4 @@
 <?php
-if( file_exists( AS_ROOT_PATH . '/vendor/autoload.php' )) {
-	include_once(AS_ROOT_PATH . '/vendor/autoload.php');
-}
-include_once(AS__PATH . '/as.autoloader.php');
 
 class ASsessionController {
 
@@ -145,7 +141,7 @@ class ASsessionController {
 		if(!isset($_SESSION['AS']['var'])) {
 			$_SESSION['AS']['var'] = [];
 
-			$ASvar = tools::ls(AS_VAR_PATH);
+			$ASvar = \framework\helpers\tools::ls(AS_VAR_PATH);
 
 			foreach( $ASvar as $item ) {
 				if($item['type']=='dir') {

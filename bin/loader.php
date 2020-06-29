@@ -19,7 +19,6 @@ class ASloader {
 				define('AS_ROOT_PATH', $wwwPath.'/../');
 				define('AS_APP_PATH', $wwwPath.'/../app/');
 				define('AS_VAR_PATH', $wwwPath.'/../var/');
-				define('AS_LOG_PATH', $wwwPath.'/../logs/');
 				define('AS_CACHE_PATH', $wwwPath.'/../cache/');
 				define('AS_TMP_PATH', $wwwPath.'/../var/tmp/');
 				define('AS__PATH', $wwwPath.'/../AS/');
@@ -44,13 +43,14 @@ class ASloader {
 
 
 		$files[] = AS__PATH.'/opts/functions.php';
-		$files[] = AS__PATH.'/opts/cacheSys.php';
-		$files[] = AS__PATH.'/opts/tools.php';
-		$files[] = AS__PATH.'/opts/email.php';
-		$files[] = AS__PATH.'/opts/db.php';
 
 		$files[] = AS__PATH.'/etc/session/controller.as.session.php';
 		$files[] = AS__PATH.'/etc/router/controller.as.router.php';
+
+		if( file_exists( AS_ROOT_PATH . '/vendor/autoload.php' )) {
+			include_once(AS_ROOT_PATH . '/vendor/autoload.php');
+		}
+		include_once(AS__PATH . '/as.autoloader.php');
 
 		return $files;
 	}
@@ -93,7 +93,7 @@ class ASloader {
 		//CLEAN START
 			if(!isset($_SESSION['AS']) || isset($_GET['cleansession'])) {
 				$_SESSION['AS'] = [];
-				$_SESSION['AS']['config'] = tools::getXMLAsArray(AS_VAR_PATH."config.xml");
+				$_SESSION['AS']['config'] = \framework\helpers\tools::getXMLAsArray(AS_VAR_PATH."config.xml");
 				foreach($_SESSION['AS']['config']['environment'] as $environment=>$opts) {
 					if(isset($opts['srv']['server_name'])) {
 						$_SESSION['AS']['config']['environment'][$environment]['srv'] = array($opts['srv']);
@@ -102,7 +102,7 @@ class ASloader {
 			}
 
 			if(isset($_GET['cleancache'])) {
-				cacheSys::deleteAllCache();
+				\framework\helpers\cache::deleteAllCache();
 			}
 
 	}

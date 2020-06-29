@@ -1,4 +1,5 @@
 <?php
+namespace framework\helpers;
 
 class db {
 
@@ -279,46 +280,6 @@ class db {
 		return $id;
 	}
 
-
-	/**
-	 * @deprecated
-	 */
-	public function cleanValue( $value, $return = "NULL" ) {
-		if( $value=="" && $return!="NULL" ) {
-			return 0;
-		}
-		elseif( $value=="" && $return=="NULL" ) {
-			return "NULL";
-		}
-		else {
-			return tools::sql($value);
-		}
-	}
-
-
-	/**
-	 * @deprecated
-	 */
-	public function updateSort( $post, $tableName, $postKey = 'sorter' ) {
-		$ids = [];
-
-		$q = "UPDATE
-					" . tools::sql($tableName) . "
-				SET [sort] = CASE id ";
-
-		foreach( $post[ $postKey ] as $k => $v ) {
-			$q     .= "
-					WHEN " . tools::sql($v) . " THEN " . tools::sql($k) . "
-				  ";
-			$ids[] = $v;
-		}
-
-		$q .= " END
-				WHERE id IN (" . implode($ids, ',') . ")";
-		//die($q);
-
-		$this->write($q);
-	}
 
 
 	private function defineConnectionSettings() {

@@ -99,8 +99,8 @@ class ASrouterController {
 
 			//if caching is allowed, we try to get the output from the cache and only if it doesn't exist do we run the resource expensive controller view()
 			if($allowCaching) {
-				$cacheKey = str_replace('?', '_',cacheSys::sanitizeKey($_SERVER['REQUEST_URI']));
-				$body	  = cacheSys::get( 'output', $cacheKey );
+				$cacheKey = str_replace('?', '_',\framework\helpers\cache::sanitizeKey($_SERVER['REQUEST_URI']));
+				$body	  = \framework\helpers\cache::get( 'output', $cacheKey );
 			}
 
 			//call local variables whether cache is real or not.
@@ -137,7 +137,7 @@ class ASrouterController {
 
 
 				if($allowCaching) {
-					cacheSys::put( 'output', $cacheKey, $body );
+					\framework\helpers\cache::put( 'output', $cacheKey, $body );
 				}
 			}
 

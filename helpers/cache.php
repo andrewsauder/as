@@ -1,5 +1,7 @@
 <?php
-class cacheSys {
+namespace framework\helpers;
+
+class cache {
 
 	public static $debug = false;
 
