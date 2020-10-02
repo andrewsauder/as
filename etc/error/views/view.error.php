@@ -1,0 +1,1 @@
+<h1>Error <?php echo $httpStatusCode; ?> <?php echo $httpStatusMessage; ?></h1>

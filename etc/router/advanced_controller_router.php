@@ -14,7 +14,7 @@ class ASAdvancedControllerRouter {
 		//route the method
 		$method = $_GET[ 'R'.$methodUrlKeyNumber ];
 
-		if($method=='') {
+		if($method=='' || get_class($controllerInstance)=='errorController') {
 			$method = 'view';
 		}
 
@@ -38,6 +38,7 @@ class ASAdvancedControllerRouter {
 			http_response_code(404);
 			exit;
 		}
+
 	}
 
 	public function get() {

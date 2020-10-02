@@ -97,7 +97,7 @@ class email {
 
 	}
 
-	public static function send($to, $subject, $message, $from='') {
+	public static function send($to, $subject, $message, $from='', $replyTo='', $replyToName='') {
 
 		if(trim($from)=='') {
 			$from = $_SESSION['AS']['config']['email']['from_address'];
@@ -143,6 +143,10 @@ class email {
 				self::$mailplugin->AddBCC($bcc);
 			}
 
+			if($replyTo!='') {
+				elog('reply to: '.$replyTo);
+				self::$mailplugin->addReplyTo($replyTo, $replyToName);
+			}
 			self::$mailplugin->SetFrom($from, $fromName);
 			self::$mailplugin->Subject = $subject;
 			self::$mailplugin->MsgHTML($message);
