@@ -108,6 +108,7 @@ class email {
 		}
 
 		self::$mailplugin = new PHPMailer(true);
+		self::$mailplugin->CharSet = 'UTF-8';
 
 		if(isset($_SESSION['AS']['config']['email']['smtp'])) {
 			error_log('sending using config email settings');
