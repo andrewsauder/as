@@ -3,7 +3,9 @@ namespace framework\helpers;
 
 class db {
 
-	private $database, $connect, $pdo;
+	private string $database = '';
+	private array $connect = [];
+	private array $pdo = [];
 
 	function __construct( $params = [] ) {
 
@@ -44,7 +46,7 @@ class db {
 	 *
 	 * @return array numerical array of the rows returned from the query
 	 */
-	public function read( $query, $params = [], $className = null ) {
+	public function read( $query, $params = [], $className = null ) : array {
 
 		try {
 
@@ -53,7 +55,7 @@ class db {
 				$connected = $this->pdoConnect([ 'read' ]);
 
 				if( $connected===false ) {
-					throw new PDOException('Database ' . $this->database . ' unavailable');
+					throw new \PDOException('Database ' . $this->database . ' unavailable');
 				}
 			}
 
@@ -71,15 +73,15 @@ class db {
 
 			//get results of query
 			if( !isset($className) ) {
-				$result = $sth->fetchAll(PDO::FETCH_ASSOC);
+				$result = $sth->fetchAll(\PDO::FETCH_ASSOC);
 			}
 			else {
-				$result = $sth->fetchAll(PDO::FETCH_CLASS, $className);
+				$result = $sth->fetchAll(\PDO::FETCH_CLASS, $className);
 			}
 
 
 		}
-		catch( PDOException $e ) {
+		catch( \PDOException $e ) {
 
 			error_log('Query Failed: ' . $query);
 			error_log('Query Error Message: ' . $e->getMessage());
@@ -101,13 +103,13 @@ class db {
 	 *
 	 * Fetch the results of a query and returns a numerical array of the first column
 	 *
-	 * @param string $query     The SQL statement to run
+	 * @param  string  $query   The SQL statement to run
 	 *
-	 * @param array  $params    (optional) Associative array of columnName=>value to pass into query
+	 * @param  array   $params  (optional) Associative array of columnName=>value to pass into query
 	 *
 	 * @return array numerical array of the first column of each row returned from the query
 	 */
-	public function readOneColumn( $query, $params = [] ) {
+	public function readOneColumn( string $query, array $params = [] ) : array {
 
 		try {
 
@@ -116,7 +118,7 @@ class db {
 				$connected = $this->pdoConnect([ 'read' ]);
 
 				if( $connected===false ) {
-					throw new PDOException('Database ' . $this->database . ' unavailable');
+					throw new \PDOException('Database ' . $this->database . ' unavailable');
 				}
 			}
 
@@ -133,10 +135,10 @@ class db {
 			}
 
 			//get results of query
-			$result = $sth->fetchAll(PDO::FETCH_COLUMN, 0);
+			$result = $sth->fetchAll(\PDO::FETCH_COLUMN, 0);
 
 		}
-		catch( PDOException $e ) {
+		catch( \PDOException $e ) {
 
 			error_log('Query Failed: ' . $query);
 			error_log('Query Error Message: ' . $e->getMessage());
@@ -176,7 +178,7 @@ class db {
 				$connected = $this->pdoConnect([ 'read' ]);
 
 				if( $connected===false ) {
-					throw new PDOException('Database ' . $this->database . ' unavailable');
+					throw new \PDOException('Database ' . $this->database . ' unavailable');
 				}
 			}
 
@@ -195,15 +197,15 @@ class db {
 			//get results of query
 			//get results of query
 			if( !isset($className) ) {
-				$result = $sth->fetch(PDO::FETCH_ASSOC);
+				$result = $sth->fetch(\PDO::FETCH_ASSOC);
 			}
 			else {
-				$sth->setFetchMode(PDO::FETCH_CLASS, $className);
+				$sth->setFetchMode(\PDO::FETCH_CLASS, $className);
 				$result = $sth->fetch();
 			}
 
 		}
-		catch( PDOException $e ) {
+		catch( \PDOException $e ) {
 
 			error_log('Query Failed: ' . $query);
 			error_log('Query Error Message: ' . $e->getMessage());
@@ -242,7 +244,7 @@ class db {
 			$connected = $this->pdoConnect([ 'write' ]);
 
 			if( $connected===false ) {
-				throw new PDOException('Database ' . $this->database . ' unavailable');
+				throw new \PDOException('Database ' . $this->database . ' unavailable');
 			}
 		}
 
@@ -259,7 +261,7 @@ class db {
 				$sth = $this->pdo[ 'write' ]->query($query);
 			}
 		}
-		catch( PDOException $e ) {
+		catch( \PDOException $e ) {
 
 			error_log('Query Failed: ' . $query);
 			error_log('Query Error Message: ' . $e->getMessage());
@@ -350,7 +352,7 @@ class db {
 			foreach( $keys as $key ) {
 
 				if( $this->connect[ $key ][ 'pdodriver' ]=='sqlsrv' ) {
-					$this->pdo[ $key ] = new PDO("sqlsrv:Server=" . $this->connect[ $key ][ 'server' ] . ";
+					$this->pdo[ $key ] = new \PDO("sqlsrv:Server=" . $this->connect[ $key ][ 'server' ] . ";
 										Database=" . $this->connect[ $key ][ 'db' ],
 					                             $this->connect[ $key ][ 'user' ],
 					                             $this->connect[ $key ][ 'pass' ]
@@ -358,7 +360,7 @@ class db {
 				}
 
 				elseif( $this->connect[ $key ][ 'pdodriver' ]=='mysql' ) {
-					$this->pdo[ $key ] = new PDO('mysql:host=' . $this->connect[ $key ][ 'server' ] . ';
+					$this->pdo[ $key ] = new \PDO('mysql:host=' . $this->connect[ $key ][ 'server' ] . ';
 									dbname=' . $this->connect[ $key ][ 'db' ],
 					                             $this->connect[ $key ][ 'user' ],
 					                             $this->connect[ $key ][ 'pass' ]
@@ -368,7 +370,7 @@ class db {
 				elseif( $this->connect[ $key ][ 'pdodriver' ]=='odbc' ) {
 
 					if( isset($this->connect[ $key ][ 'dsn' ]) ) {
-						$this->pdo[ $key ] = new PDO("odbc:DSN=" . $this->connect[ $key ][ 'dsn' ],
+						$this->pdo[ $key ] = new \PDO("odbc:DSN=" . $this->connect[ $key ][ 'dsn' ],
 						                             $this->connect[ $key ][ 'user' ],
 						                             $this->connect[ $key ][ 'pass' ]
 						);
@@ -376,7 +378,7 @@ class db {
 
 					//dBASE, Access (file based)
 					elseif( strpos(strtolower($this->connect[ $key ][ 'driver' ]), 'dbase')!==false || strpos(strtolower($this->connect[ $key ][ 'driver' ]), 'access')!==false ) {
-						$this->pdo[ $key ] = new PDO("odbc:Driver=" . $this->connect[ $key ][ 'driver' ] . ";
+						$this->pdo[ $key ] = new \PDO("odbc:Driver=" . $this->connect[ $key ][ 'driver' ] . ";
 											Dbq=" . $this->connect[ $key ][ 'server' ] . ";
 											UID=" . $this->connect[ $key ][ 'user' ] . ";",
 						                             $this->connect[ $key ][ 'user' ],
@@ -391,7 +393,7 @@ class db {
 											Dbq=" . $this->connect[ $key ][ 'db' ] . ";
 											UID=" . $this->connect[ $key ][ 'user' ] . ";
 											PWD=" . $this->connect[ $key ][ 'pass' ] . ";";
-						$this->pdo[ $key ] = new PDO($connStr,
+						$this->pdo[ $key ] = new \PDO($connStr,
 						                             $this->connect[ $key ][ 'user' ],
 						                             $this->connect[ $key ][ 'pass' ]
 						);
@@ -399,7 +401,7 @@ class db {
 
 					//pervasive 32 bit
 					else {
-						$this->pdo[ $key ] = new PDO("odbc:Driver=" . $this->connect[ $key ][ 'driver' ] . ";
+						$this->pdo[ $key ] = new \PDO("odbc:Driver=" . $this->connect[ $key ][ 'driver' ] . ";
 											ServerName=" . $this->connect[ $key ][ 'server' ] . ";
 											ServerDSN=" . $this->connect[ $key ][ 'db' ] . ";
 											UID=" . $this->connect[ $key ][ 'user' ] . ";
@@ -410,12 +412,12 @@ class db {
 					}
 				}
 
-				$this->pdo[ $key ]->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+				$this->pdo[ $key ]->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
 
 			}
 
 		}
-		catch( PDOException $e ) {
+		catch( \PDOException $e ) {
 			error_log($e->getMessage());
 		}
 
