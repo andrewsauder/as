@@ -137,10 +137,17 @@ class ASloader {
 		$this->initiateApp();
 	}
 
-	public function renderApp() {
-		$router = new ASrouterController( $_GET, $_POST );
-		$c = $router->getPage();
-		return $c;
+	public function renderApp() : string {
+		if(isset($_SESSION['AS']['config']['settings']) && isset($_SESSION['AS']['config']['settings']['routing']) && $_SESSION['AS']['config']['settings']['routing']=='defined') {
+			$router = new \framework\helpers\router();
+			return $router->route();
+		}
+		else {
+			$router = new ASrouterController( $_GET, $_POST );
+			return $router->getPage();
+		}
+
+
 	}
 
 

@@ -15,6 +15,7 @@ class ASrouterController {
 		$controller	= $route['controller'];
 		$router		= $route['router'];
 
+		$rendered = '';
 		if($controller!==false) {
 			$rendered = $this->getContent( $controller, $router );
 		}
