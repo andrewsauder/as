@@ -13,9 +13,9 @@ class router {
 
 	/**
 	 * @return string
-	 * @throws \Exception
+	 * @throws \framework\helpers\models\routeException
 	 */
-	public function route() : string {
+	protected function routeMain() : string {
 
 		$appRouter = new \app\router\router();
 
@@ -27,11 +27,11 @@ class router {
 		} );
 
 
-// Fetch method and URI from somewhere
+		// Fetch method and URI from somewhere
 		$httpMethod = $_SERVER[ 'REQUEST_METHOD' ];
 		$uri        = $_SERVER[ 'REQUEST_URI' ];
 
-// Strip query string (?foo=bar) and decode URI
+		// Strip query string (?foo=bar) and decode URI
 		if( false !== $pos = strpos( $uri, '?' ) ) {
 			$uri = substr( $uri, 0, $pos );
 		}
@@ -41,12 +41,14 @@ class router {
 		switch( $routeInfo[ 0 ] ) {
 			case \FastRoute\Dispatcher::NOT_FOUND:
 				// ... 404 Not Found
-				//TODO: add error routing
+				http_response_code(404);
+				throw new \framework\helpers\models\routeException ('Not Found', 404);
 				break;
 			case \FastRoute\Dispatcher::METHOD_NOT_ALLOWED:
 				$allowedMethods = $routeInfo[ 1 ];
 				// ... 405 Method Not Allowed
-				//TODO: add error routing
+				http_response_code(405);
+				throw new \framework\helpers\models\routeException ('Method Not Allowed', 405);
 				break;
 			case \FastRoute\Dispatcher::FOUND:
 
@@ -58,7 +60,8 @@ class router {
 					if($handler->authentication) {
 						//TODO: expand to handle roles?
 						if(!$appRouter->authentication()) {
-							throw new \Exception('Authentication failed', 401);
+							http_response_code(401);
+							throw new \framework\helpers\models\routeException ('Authentication failed', 401);
 						}
 					}
 
@@ -67,20 +70,25 @@ class router {
 				}
 				catch( \framework\helpers\models\routeException $e ) {
 					//TODO: render error
-					elog($e->getMessage());
-					http_response_code( $e->getCode() );
-					return $e->getMessage();
+					if($e->getCode()>200 && $e->getCode()<600) {
+						http_response_code($e->getCode());
+					}
+					else {
+						http_response_code(500);
+					}
+					throw new \framework\helpers\models\routeException ($e->getMessage(), $e->getCode(), $e);
 				}
-				catch( \Exception $e ) {
-					//TODO: render error
-					elog($e->getMessage());
-					return $e->getMessage();
-				}
+//				catch( \Exception $e ) {
+//					//TODO: render error
+//					http_response_code(500);
+//					throw new \framework\helpers\models\routeException($e->getMessage(), 500, $e);
+//				}
 
 				break;
 		}
 
-		return '';
+		http_response_code(500);
+		throw new \framework\helpers\models\routeException ('Routing failed', 500);
 
 	}
 

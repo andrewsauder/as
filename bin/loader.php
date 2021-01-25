@@ -139,7 +139,7 @@ class ASloader {
 
 	public function renderApp() : string {
 		if(isset($_SESSION['AS']['config']['settings']) && isset($_SESSION['AS']['config']['settings']['routing']) && $_SESSION['AS']['config']['settings']['routing']=='defined') {
-			$router = new \framework\helpers\router();
+			$router = new \app\router\router();
 			return $router->route();
 		}
 		else {
