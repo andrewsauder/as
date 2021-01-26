@@ -1,7 +1,7 @@
 <?php
 
 
-namespace framework\helpers\models;
+namespace framework\models;
 
 
 use JetBrains\PhpStorm\Pure;

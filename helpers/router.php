@@ -4,7 +4,7 @@
 namespace framework\helpers;
 
 
-class router {
+abstract class router {
 
 	public function __construct() {
 
@@ -13,16 +13,16 @@ class router {
 
 	/**
 	 * @return string
-	 * @throws \framework\helpers\models\routeException
+	 * @throws \framework\exceptions\routeException
 	 */
-	protected function routeMain() : string {
+	protected function executeRouteAndRender() : string {
 
-		$appRouter = new \app\router\router();
+		$routes = $this->getRoutes();
 
-		$dispatcher = \FastRoute\simpleDispatcher( function( \FastRoute\RouteCollector $r ) use ( $appRouter ) {
+		$dispatcher = \FastRoute\simpleDispatcher( function( \FastRoute\RouteCollector $r ) use ( $routes ) {
 
-			foreach( $appRouter->getRoutes() as $route ) {
-				$r->addRoute( $route->httpMethod, $route->route, new \framework\helpers\models\routeHandler( $route->class, $route->method, $route->authentication ) );
+			foreach( $routes as $route ) {
+				$r->addRoute( $route->httpMethod, $route->route, new \framework\models\routeHandler( $route->class, $route->method, $route->authentication ) );
 			}
 		} );
 
@@ -42,13 +42,13 @@ class router {
 			case \FastRoute\Dispatcher::NOT_FOUND:
 				// ... 404 Not Found
 				http_response_code(404);
-				throw new \framework\helpers\models\routeException ('Not Found', 404);
+				throw new \framework\exceptions\routeException ( 'Not Found', 404);
 				break;
 			case \FastRoute\Dispatcher::METHOD_NOT_ALLOWED:
 				$allowedMethods = $routeInfo[ 1 ];
 				// ... 405 Method Not Allowed
 				http_response_code(405);
-				throw new \framework\helpers\models\routeException ('Method Not Allowed', 405);
+				throw new \framework\exceptions\routeException ( 'Method Not Allowed', 405);
 				break;
 			case \FastRoute\Dispatcher::FOUND:
 
@@ -57,91 +57,110 @@ class router {
 
 				try {
 					//authenticate
-					if($handler->authentication) {
-						//TODO: expand to handle roles?
-						if(!$appRouter->authentication()) {
-							http_response_code(401);
-							throw new \framework\helpers\models\routeException ('Authentication failed', 401);
-						}
+					//TODO: expand authentication to handle roles?
+					if($handler->authentication && !$this->authentication()) {
+						http_response_code(401);
+						throw new \framework\exceptions\routeException ( 'Authentication failed', 401);
 					}
 
 					//return rendered
 					return $this->render( $handler, $vars );
 				}
-				catch( \framework\helpers\models\routeException $e ) {
-					//TODO: render error
+				catch( \framework\exceptions\controllerException | \framework\exceptions\routeException $e ) {
 					if($e->getCode()>200 && $e->getCode()<600) {
 						http_response_code($e->getCode());
 					}
 					else {
 						http_response_code(500);
 					}
-					throw new \framework\helpers\models\routeException ($e->getMessage(), $e->getCode(), $e);
+					throw new \framework\exceptions\routeException ( $e->getMessage(), $e->getCode(), $e);
 				}
-//				catch( \Exception $e ) {
-//					//TODO: render error
-//					http_response_code(500);
-//					throw new \framework\helpers\models\routeException($e->getMessage(), 500, $e);
-//				}
-
+				catch( \Exception|\Error|\ErrorException $e ) {
+					\error_log($e);
+					http_response_code(500);
+					throw new \framework\exceptions\routeException('Unhandled major system error. Contact support.', 500, $e);
+				}
 				break;
 		}
 
 		http_response_code(500);
-		throw new \framework\helpers\models\routeException ('Routing failed', 500);
+		throw new \framework\exceptions\routeException( 'Routing failed', 500);
 
 	}
 
 
 	/**
-	 * @param  \framework\helpers\models\routeHandler  $handler
-	 * @param  array                                   $vars
+	 * @param  \framework\models\routeHandler  $handler
+	 * @param  array                           $vars
 	 *
 	 * @return string
-	 * @throws \Exception
-	 * @throws \ReflectionException
 	 */
-	private function render( \framework\helpers\models\routeHandler $handler, array $vars ) : string {
+	private function render( \framework\models\routeHandler $handler, array $vars ) : string {
 
-		//get class via reflection
+		//exceptions raised here are all logic exceptions: a route is defined that points to a class or method that does not exist
 		try {
+
 			$class = new \ReflectionClass( $handler->class );
-		}
-		catch( \ReflectionException $e ) {
-			throw new \Exception('Class '.$handler->class.' does not exist: '.$e->getMessage(), 404, $e );
-		}
 
-		//get method via reflection
-		try {
 			$method = $class->getMethod( $handler->method );
-		}
-		catch( \ReflectionException $e ) {
-			throw new \Exception('Class '.$handler->class.' does not contain method '.$handler->method.': '.$e->getMessage(), 404, $e );
-		}
 
-		//instantiate class
-		if($method->isStatic()) {
-			$instance = $class->newInstanceWithoutConstructor();
-		}
-		else {
-			$instance = $class->newInstance();
-		}
-
-		try {
-			$result = $method->invokeArgs( $instance, $vars );
-		}
-		catch( \ReflectionException $e ) {
-				throw new \Exception('Invalid parameters provided for '.$handler->class.'->'.$handler->method.': '.$e->getMessage(), 400, $e );
+			if($method->isStatic()) {
+				$instance = $class->newInstanceWithoutConstructor();
 			}
+			else {
+				$instance = $class->newInstance();
+			}
+
+			$result = $method->invokeArgs( $instance, $vars );
+
+		}
+		catch( \ReflectionException $e ) {
+			error_log($e);
+			throw new \Error($e->getMessage(), 0, $e);
+		}
 
 		if( isset( $result[ 'data' ] ) ) {
 			header( 'Content-Type:application/json' );
-
 			return json_encode( $result[ 'data' ] );
 		}
 
-		throw new \Exception('View and vars not implemented yet', 500);
+		//LOGIC ERROR: view and vars for templated views does not exist
+		throw new \Error('View and vars not implemented');
 
 	}
 
+
+	/**
+	 * Defines URL routes and returns them as an array
+	 *
+	 * @return \framework\models\route[]
+	 */
+	abstract function getRoutes() : array;
+
+
+	/**
+	 * Performs actual route by calling executeRouteAndRender() and handles exceptions for displaying errors
+	 *
+	 * Example of what should be inside route method:
+	 * <code>
+	 * try {
+	 *     return $this->executeRouteAndRender();
+	 * }
+	 * catch( \framework\exceptions\routeException  $e ) {
+	 *     \app\services\api::sendError( $e->getCode(), $e->getMessage() );
+	 * }
+	 * </code>
+	 *
+	 * @return string
+	 */
+	abstract function route() : string;
+
+
+	/**
+	 * Checks if user is authenticated and returns true if yes, or false if not
+	 *
+	 * @return bool
+	 * @throws \framework\exceptions\routeException
+	 */
+	abstract function authentication() : bool;
 }
