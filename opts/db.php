@@ -458,7 +458,7 @@ class db {
 			error_log($e->getMessage());
 		}
 
-		if( count($this->pdo)===0 ) {
+		if( $this->pdo===null ||  count($this->pdo)===0 ) {
 
 			foreach( $keys as $key ) {
 				error_log('Database failed to load. Driver:' . $this->connect[ $key ][ 'driver' ] . '; Server:' . $this->connect[ $key ][ 'server' ] . '; DB:' . $this->connect[ $key ][ 'db' ]);
