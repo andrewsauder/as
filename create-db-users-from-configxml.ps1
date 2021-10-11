@@ -54,9 +54,9 @@ foreach( $srv in $config.config.environment.local.srv) {
                     END CATCH
 
                     GO
-                    CREATE LOGIN [$writer] WITH PASSWORD=N'$writerpass', DEFAULT_DATABASE=[W_Timeclock], DEFAULT_LANGUAGE=[us_english], CHECK_EXPIRATION=OFF, CHECK_POLICY=OFF
+                    CREATE LOGIN [$writer] WITH PASSWORD=N'$writerpass', DEFAULT_DATABASE=[$db], DEFAULT_LANGUAGE=[us_english], CHECK_EXPIRATION=OFF, CHECK_POLICY=OFF
                     GO
-                    CREATE LOGIN [$reader] WITH PASSWORD=N'$readerpass', DEFAULT_DATABASE=[W_Timeclock], DEFAULT_LANGUAGE=[us_english], CHECK_EXPIRATION=OFF, CHECK_POLICY=OFF
+                    CREATE LOGIN [$reader] WITH PASSWORD=N'$readerpass', DEFAULT_DATABASE=[$db], DEFAULT_LANGUAGE=[us_english], CHECK_EXPIRATION=OFF, CHECK_POLICY=OFF
                     GO
 
 
@@ -74,7 +74,11 @@ foreach( $srv in $config.config.environment.local.srv) {
                     GO
                 ";
 
-                Invoke-Sqlcmd -ServerInstance $SqlServer -Query $SqlQuery
+                Write-Host $SqlServer
+                Write-Host $SqlQuery
+
+                #Invoke-Sqlcmd -ServerInstance $SqlServer -Query $SqlQuery
+                Invoke-Sqlcmd -Query $SqlQuery
 
              }
         }
