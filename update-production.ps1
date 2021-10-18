@@ -58,7 +58,7 @@ if (Test-Path -Path 'www/web-prod.config' -PathType Leaf) {
 ##COMPOSER
 if (Test-Path -Path 'composer-prod.json' -PathType Leaf) {
 	Write-Host "update composer environment file" -ForegroundColor Yellow
-	Copy-Item -Path app/composer-prod.json -Destination app/composer.json
+	Copy-Item -Path composer-prod.json -Destination composer.json
 }
 if (Test-Path -Path 'composer.json' -PathType Leaf) {
 	Write-Host "composer install" -ForegroundColor Yellow
