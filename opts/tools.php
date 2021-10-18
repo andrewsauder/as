@@ -8,6 +8,10 @@ class tools {
 
 		if(is_array($value)) {
 			foreach($value as $k=> $v) {
+				if(is_array($v)) {
+					$value[$k] = tools::sql($v);
+					return $value;
+				}
 				$v2 = iconv('UTF-8', 'ASCII//TRANSLIT', $v);
 				if($v2===false || $v2=='') {
 					$v2 = $v;
