@@ -285,27 +285,27 @@ class ASrouterController {
 			}
 		}
 
-		if(substr($viewAndVars['view'],0,1)=='/') {
-			$path = $viewAndVars['view'];
-		}
-		elseif(substr($viewAndVars['view'],1,2)==':\\') {
-			$path = $viewAndVars['view'];
-		}
-		elseif (substr($viewAndVars['view'], 0, 2) == '\\\\') { // support for UNC paths (Eric)
-			$path = $viewAndVars['view'];
-		}
-		else {
-			if(substr($viewAndVars['view'], 0, strlen($this->sid)) == $this->sid) {
-				$path = '/'.$viewAndVars['view'];
+		if(isset($viewAndVars['view'])) {
+			if(substr($viewAndVars['view'],0,1)=='/') {
+				$path = $viewAndVars['view'];
+			}
+			elseif(substr($viewAndVars['view'],1,2)==':\\') {
+				$path = $viewAndVars['view'];
+			}
+			elseif (substr($viewAndVars['view'], 0, 2) == '\\\\') { // support for UNC paths (Eric)
+				$path = $viewAndVars['view'];
 			}
 			else {
-				$path = '/'.$this->sid.'/'.$viewAndVars['view'];
+				if(substr($viewAndVars['view'], 0, strlen($this->sid)) == $this->sid) {
+					$path = '/'.$viewAndVars['view'];
+				}
+				else {
+					$path = '/'.$this->sid.'/'.$viewAndVars['view'];
+				}
 			}
-		}
+			$viewToInclude = view($path);
 
-		$viewToInclude = view($path);
-
-		ob_start();
+			ob_start();
 			if(stream_resolve_include_path($viewToInclude)!==false) {
 				include($viewToInclude);
 			}
@@ -313,9 +313,12 @@ class ASrouterController {
 				echo '<script>window.'.$this->sid.' = '. json_encode($viewAndVars['js']).';</script>';
 			}
 			$body = ob_get_contents();
-		ob_end_clean();
+			ob_end_clean();
 
-		return $body;
+			return $body;
+		}
+
+		return '';
 	}
 
 }
