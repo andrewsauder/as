@@ -157,31 +157,6 @@ class tools {
 		return $q;
 	}
 
-	//select boxes that have both employee ID and employee Group IDs pass: 'e#' or 'g#'. this function determines which one.
-	public static function EGdecider($post, $key, $finEmpName = '', $finGrpName = '') {
-
-		$employeeID = null;
-		$employeeGroupsID = null;
-
-		switch(substr($post[$key], 0, 1)) {
-			case 'e':
-				$employeeID = substr($post[$key], 1);
-				$employeeGroupsID = '';
-				break;
-			case 'g':
-				$employeeID = '';
-				$employeeGroupsID = substr($post[$key], 1);
-				break;
-		}
-
-		$fin = array(
-			$finEmpName=>$employeeID,
-			$finGrpName=>$employeeGroupsID
-		);
-
-		return $fin;
-	}
-
 
 	public static function checkToken($hours = 8, $etag = NULL) {
 
