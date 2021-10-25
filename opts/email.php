@@ -1,6 +1,5 @@
 <?php
-include_once(AS__PATH.'libs/PHPMailer_v5-2/class.phpmailer.php');
-include_once(AS__PATH.'libs/PHPMailer_v5-2/class.smtp.php');
+
 class email {
 
 	private static $from = '';
@@ -107,7 +106,7 @@ class email {
 			$fromName = $from;
 		}
 
-		self::$mailplugin = new PHPMailer(true);
+		self::$mailplugin = new \PHPMailer\PHPMailer\PHPMailer(true);
 		self::$mailplugin->CharSet = 'UTF-8';
 
 		if(isset($_SESSION['AS']['config']['email']['smtp'])) {
@@ -175,7 +174,7 @@ class email {
 			return true;
 
 		}
-		catch(phpmailerException $e) {
+		catch(\PHPMailer\PHPMailer\Exception $e) {
 			error_log('MAIL: PHPMailer library exception - failed sending to '. $to.' with subject line '.$subject.'. Error: '.$e->errorMessage());
 			return false;
 		}
