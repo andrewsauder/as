@@ -16,7 +16,7 @@ if(!isset($scriptNest)) {
     window.AS_APP = '<?php echo AS_APP; ?>';
 
     function getFullURL() {
-        return '<?php echo trim( getFullURL(), '/'); ?>';
+        return '<?php echo trim( htmlspecialchars( getFullURL(), ENT_QUOTES ), '/'); ?>';
     }
 
     function getBaseURL() {
