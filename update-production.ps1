@@ -42,13 +42,6 @@ git submodule sync
 Write-Host "git submodule update" -ForegroundColor Yellow
 git submodule update
 
-
-##ENV
-if (Test-Path -Path 'app/config/environment-prod.json' -PathType Leaf) {
-	Write-Host "update environment files" -ForegroundColor Yellow
-	Copy-Item -Path app/config/environment-prod.json -Destination app/config/environment.json
-}
-
 ##IIS
 if (Test-Path -Path 'www/web-prod.config' -PathType Leaf) {
 	Write-Host "update web.config environment file" -ForegroundColor Yellow
@@ -58,7 +51,7 @@ if (Test-Path -Path 'www/web-prod.config' -PathType Leaf) {
 ##COMPOSER
 if (Test-Path -Path 'composer-prod.json' -PathType Leaf) {
 	Write-Host "update composer environment file" -ForegroundColor Yellow
-	Copy-Item -Path app/config/environment-prod.json -Destination app/config/environment.json
+	Copy-Item -Path composer-prod.json -Destination composer.json
 }
 if (Test-Path -Path 'composer.json' -PathType Leaf) {
 	Write-Host "composer install" -ForegroundColor Yellow
