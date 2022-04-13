@@ -1,6 +1,4 @@
 <?php
-include_once(AS__PATH.'/libs/random_compat/random.php');
-
 function hasValue($var, $checkZero = false) {
 	if(!isset($var)) {
 		return false;
