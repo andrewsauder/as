@@ -64,6 +64,7 @@ class ASloader {
 		$files[] = AS__PATH.'/opts/tools.php';
 		$files[] = AS__PATH.'/opts/email.php';
 		$files[] = AS__PATH.'/opts/db.php';
+		$files[] = AS__PATH.'/opts/db2.php';
 
 		$files[] = AS__PATH.'/etc/session/controller.as.session.php';
 		$files[] = AS__PATH.'/etc/router/controller.as.router.php';
