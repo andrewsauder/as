@@ -514,6 +514,8 @@ class tools {
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
 		curl_setopt($ch, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_1_1);
+		curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 10);
+		curl_setopt($ch, CURLOPT_TIMEOUT, 20);
 
 		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
 		curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
@@ -577,11 +579,16 @@ class tools {
 
 		$httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 
-		if($_SESSION[AS_APP]['testing']) {
+		//if($_SESSION[AS_APP]['testing']) {
 			if($curl_errno) {
-				error_log('easyCURL error '.$curl_errno.' (http status '.$httpCode.') on url '.$params['url']);
+				if(isset($_SESSION[AS_APP]['authentication'])){
+					error_log('curl error '.$curl_errno.' (http status '.$httpCode.') for user id '.$_SESSION[AS_APP]['authentication']->id.' on '.$params['method'].': '.$params['url']);
+				}
+				else {
+					error_log('curl error '.$curl_errno.' (http status '.$httpCode.') on '.$params['method'].': '.$params['url']);
+				}
 			}
-		}
+		//}
 
 		//close connection
 		curl_close($ch);
