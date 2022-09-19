@@ -23,7 +23,11 @@ class cronMonitor {
 	}
 
 	public function end() {
-		$cronFinish = json_decode( tools::easyCURL(['url'=>$_SESSION[AS_APP]['environment']['cron_monitor_url'].'jobHistory/end/'.$this->jobId.'/'.$this->runId]) );
+		$url = $_SESSION[AS_APP]['environment']['cron_monitor_url'].'jobHistory/end/'.$this->jobId;
+		if( is_string($this->runId) ) {
+			$url .= '/'.$this->runId;
+		}
+		$cronFinish = json_decode( tools::easyCURL(['url'=>$url]) );
 	}
 
 }
