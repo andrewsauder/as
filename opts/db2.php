@@ -84,8 +84,8 @@ class db2 {
 		$this->readUsername = $dbConnector[ 'read' ][ 'user' ] ?? '';
 		$this->readPassword = $dbConnector[ 'read' ][ 'pass' ] ?? '';
 
-		$this->writeUsername = $dbConnector[ 'read' ][ 'user' ] ?? '';
-		$this->writePassword = $dbConnector[ 'read' ][ 'pass' ] ?? '';
+		$this->writeUsername = $dbConnector[ 'write' ][ 'user' ] ?? '';
+		$this->writePassword = $dbConnector[ 'write' ][ 'pass' ] ?? '';
 	}
 
 
