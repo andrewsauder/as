@@ -209,7 +209,8 @@ class db2 {
 	 * @throws \LogicException
 	 * @throws \PDOException
 	 */
-	public function write( string $query, array $params = [] ) : string|int|bool {
+	public function write( string $query, array $params = [] ) : string|int|bool|\PDOStatement {
+		//will be an object reference to $this->writePdo if  the write is inside a transaction
 		$pdo = $this->pdo( false );
 
 		//run the query
@@ -233,7 +234,7 @@ class db2 {
 		try {
 			return $pdo->lastInsertId();
 		}
-		catch(\Exception $e) {
+		catch(\PDOException $e) {
 			return $sth;
 		}
 
@@ -241,9 +242,71 @@ class db2 {
 
 
 	/**
+	 * @return bool
+	 */
+	public function beginTransaction(): bool {
+		try {
+			$this->writePdo = $this->pdo( false );
+			return $this->writePdo->beginTransaction();
+		}
+		catch(\PDOException $e) {
+			return false;
+		}
+	}
+
+
+	/**
+	 * @return bool
+	 * @throws \PDOException
+	 */
+	public function commitTransaction(): bool {
+		if( $this->writePdo===null || !$this->writePdo->inTransaction() ) {
+			throw new \PDOException('No transaction is open to commit');
+		}
+
+		$committed = false;
+		try {
+			$committed = $this->writePdo->commit();
+		}
+		catch( \PDOException $e ) {
+			if( $this->writePdo->inTransaction()) {
+				$this->writePdo->rollBack();
+			}
+		}
+
+		$this->writePdo = null;
+
+		return $committed;
+	}
+
+
+	/**
+	 * @return bool
+	 * @throws \PDOException
+	 */
+	public function rollbackTransaction(): bool {
+		if( $this->writePdo===null || !$this->writePdo->inTransaction() ) {
+			throw new \PDOException('No transaction is open to rollback');
+		}
+
+		$rolledBack = false;
+		if( $this->writePdo->inTransaction()) {
+			$rolledBack = $this->writePdo->rollBack();
+		}
+
+		$this->writePdo = null;
+
+		return $rolledBack;
+	}
+
+
+	/**
 	 * @param  bool  $readOnly
 	 *
 	 * @return \PDO
+	 *
+	 * @throws \LogicException
+	 * @throws \PDOException
 	 */
 	private function pdo( bool $readOnly = true ) : \PDO {
 		//return existing connection
