@@ -98,7 +98,6 @@ class db2 {
 	 * @param  ?string  $className  (optional) to retrieve each row as a specific class, pass the fully qualified class name. Excluding a class name will return an associative array for each row of data.
 	 *
 	 * @return array numerical array of the rows returned from the query
-	 * @throws \LogicException
 	 * @throws \PDOException
 	 */
 	public function read( string $query, array $params = [], ?string $className = null ) : array {
@@ -136,7 +135,6 @@ class db2 {
 	 * @param  array   $params  (optional) Associative array of columnName=>value to pass into query
 	 *
 	 * @return array numerical array of the first column of each row returned from the query
-	 * @throws \LogicException
 	 * @throws \PDOException
 	 */
 	public function readOneColumn( string $query, array $params = [] ) : array {
@@ -168,7 +166,6 @@ class db2 {
 	 *
 	 * @return mixed associative array of the columns selected for the last or only row of data OR specific class type if class name is provided
 	 *
-	 * @throws \LogicException
 	 * @throws \PDOException
 	 */
 	public function readOneRow( string $query, array $params = [], ?string $className = null ) : mixed {
@@ -206,7 +203,6 @@ class db2 {
 	 *
 	 * @param $query  (string) the SQL statement to run
 	 *
-	 * @throws \LogicException
 	 * @throws \PDOException
 	 */
 	public function write( string $query, array $params = [] ) : string|int|bool|\PDOStatement {
@@ -285,12 +281,8 @@ class db2 {
 	 * @throws \PDOException
 	 */
 	public function rollbackTransaction(): bool {
-		if( $this->writePdo===null || !$this->writePdo->inTransaction() ) {
-			throw new \PDOException('No transaction is open to rollback');
-		}
-
-		$rolledBack = false;
-		if( $this->writePdo->inTransaction()) {
+		$rolledBack = true;
+		if( $this->writePdo instanceof \PDO && $this->writePdo->inTransaction()) {
 			$rolledBack = $this->writePdo->rollBack();
 		}
 
