@@ -323,8 +323,7 @@ class db2 {
 		];
 
 		if( $this->connectionSettings[ 'pdodriver' ] == 'sqlsrv' ) {
-			$pdo = new PDO( "sqlsrv:Server=" . $this->connectionSettings[ 'server' ] . ";
-								Database=" . $this->connectionSettings[ 'db' ], $username, $password );
+			$pdo = new PDO( "sqlsrv:Server=" . $this->connectionSettings[ 'server' ] . ";Database=" . $this->connectionSettings[ 'db' ].";TrustServerCertificate=1", $username, $password );
 			$pdo->setAttribute( PDO::SQLSRV_ATTR_QUERY_TIMEOUT, 10 );
 		}
 

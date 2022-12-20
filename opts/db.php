@@ -389,8 +389,7 @@ class db {
 			foreach( $keys as $key ) {
 
 				if( $this->connect[ $key ][ 'pdodriver' ]=='sqlsrv' ) {
-					$this->pdo[ $key ] = new PDO("sqlsrv:Server=" . $this->connect[ $key ][ 'server' ] . ";
-										Database=" . $this->connect[ $key ][ 'db' ],
+					$this->pdo[ $key ] = new PDO("sqlsrv:Server=" . $this->connect[ $key ][ 'server' ] . ";Database=" . $this->connect[ $key ][ 'db' ].";TrustServerCertificate=1",
 					                             $this->connect[ $key ][ 'user' ],
 					                             $this->connect[ $key ][ 'pass' ]
 					);
