@@ -157,8 +157,11 @@ function error($status, $redirectToError=true) {
  * @param bool $die If true, function dies after setting status code and optionally including error page. If false, caller must handle the error output.
  * @return int new HTTP status code
  */
-function httpError($statusCode, $replaceOBwError=true, $die=true) {
+function httpError($statusCode, $replaceOBwError=true, $die=true, $message='') {
 	if(!headers_sent()) {
+		if(!empty($message)) {
+			$GLOBALS [ 'error_message' ] = $message;
+		}
 		http_response_code($statusCode);
 	}
 	if($replaceOBwError) {
