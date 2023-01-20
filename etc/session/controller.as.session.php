@@ -86,20 +86,24 @@ class ASsessionController {
 						//define active environment (local, cli, dev, prod) for testing variables
 						$activeEnvironment = $environment;
 
-						//set environment in session
-						$_SESSION[ AS_APP ]['environment'] = $server;
 
 						//build data connectors
 						if(isset($server['db_connector'])) {
+							$db_connectors = [];
 							if(isset($server['db_connector']['server'])) {
-								$db_connectors = array( $server['db_connector']['db'] => $server['db_connector'] );
+								$server['db_connector'] = array( $server['db_connector'] );
 							}
-							else {
-								$db_connectors = [];
-								if(count($server['db_connector'])>0) {
-									foreach($server['db_connector'] as $db_connector) {
-										$db_connectors[ $db_connector['db'] ] = $db_connector;
+
+							if(count($server['db_connector'])>0) {
+								foreach($server['db_connector'] as $i=>$db_connector) {
+									if(!isset( $db_connector[ 'alias' ])) {
+										$db_connector[ 'alias' ] = [];
 									}
+									if(!is_array($db_connector[ 'alias' ])) {
+										$db_connector[ 'alias' ] = [ $db_connector[ 'alias' ] ];
+									}
+									$db_connectors[ $db_connector['db'] ] = $db_connector;
+									$server['db_connector'][$i] = $db_connector;
 								}
 							}
 
@@ -108,6 +112,9 @@ class ASsessionController {
 								'default_db'=>$server['default_db']
 							);
 						}
+
+						//set environment in session
+						$_SESSION[ AS_APP ]['environment'] = $server;
 
 						break;
 					}
