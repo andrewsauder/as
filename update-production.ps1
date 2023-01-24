@@ -58,19 +58,19 @@ if($env -ne "local")
 
 ##ENV
 if (Test-Path -Path "app/config/environment-$env.json" -PathType Leaf) {
-	Write-Host "update environment files" -ForegroundColor Yellow
+	Write-Host "update environment file app/config/environment-$env.json --> app/config/environment.json" -ForegroundColor Yellow
 	Copy-Item -Path app/config/environment-$env.json -Destination app/config/environment.json
 }
 
 ##IIS
 if (Test-Path -Path "www/web-$env.config" -PathType Leaf) {
-	Write-Host "update web.config environment file" -ForegroundColor Yellow
+	Write-Host "update web.config environment file www/web-$env.config --> www/web.config" -ForegroundColor Yellow
 	Copy-Item -Path www/web-$env.config -Destination www/web.config
 }
 
 ##COMPOSER
 if (Test-Path -Path "composer-$env.json" -PathType Leaf) {
-	Write-Host "update composer environment file" -ForegroundColor Yellow
+	Write-Host "update composer environment file composer-$env.json --> composer.json" -ForegroundColor Yellow
 	Copy-Item -Path composer-$env.json -Destination composer.json
 }
 if (Test-Path -Path "composer.json" -PathType Leaf) {
