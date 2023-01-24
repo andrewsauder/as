@@ -1,3 +1,12 @@
+Param(
+    [Parameter()]
+    [string]
+    $env='prod'
+)
+if ($env -eq $null) {
+    $env = read-host -Prompt "Please enter an environment (local, dev, or prod)"
+}
+
 function Menu ($object, $prompt) {
     if (!$object) { Throw 'Must provide an object.' }
     $ok = $false
@@ -22,6 +31,8 @@ function Menu ($object, $prompt) {
 }
 
 Push-Location $PSScriptRoot\..\
+Write-Host "Environment: "$env -ForegroundColor Red
+
 Write-Host "Running in directory "$PSScriptRoot\..\ -ForegroundColor Yellow
 
 ##GIT
@@ -44,23 +55,23 @@ git submodule update
 
 
 ##ENV
-if (Test-Path -Path 'app/config/environment-prod.json' -PathType Leaf) {
+if (Test-Path -Path "app/config/environment-$env.json" -PathType Leaf) {
 	Write-Host "update environment files" -ForegroundColor Yellow
-	Copy-Item -Path app/config/environment-prod.json -Destination app/config/environment.json
+	Copy-Item -Path app/config/environment-$env.json -Destination app/config/environment.json
 }
 
 ##IIS
-if (Test-Path -Path 'www/web-prod.config' -PathType Leaf) {
+if (Test-Path -Path "www/web-$env.config" -PathType Leaf) {
 	Write-Host "update web.config environment file" -ForegroundColor Yellow
-	Copy-Item -Path www/web-prod.config -Destination www/web.config
+	Copy-Item -Path www/web-$env.config -Destination www/web.config
 }
 
 ##COMPOSER
-if (Test-Path -Path 'composer-prod.json' -PathType Leaf) {
+if (Test-Path -Path "composer-$env.json" -PathType Leaf) {
 	Write-Host "update composer environment file" -ForegroundColor Yellow
-	Copy-Item -Path composer-prod.json -Destination composer.json
+	Copy-Item -Path composer-$env.json -Destination composer.json
 }
-if (Test-Path -Path 'composer.json' -PathType Leaf) {
+if (Test-Path -Path "composer.json" -PathType Leaf) {
 	Write-Host "composer install" -ForegroundColor Yellow
 	composer install
 
