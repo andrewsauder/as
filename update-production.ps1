@@ -42,7 +42,7 @@ git pull
 if($env -ne "local")
 {
     Write-Host "`nMost Recent Tags:" -ForegroundColor Yellow
-    $recentTags = git tag --sort = version: refname | select -Last 5
+    $recentTags = git tag --sort=version:refname | select -Last 5
 
     $tag = menu -object $recentTags -prompt 'Which tag do you want to check out?'
 
