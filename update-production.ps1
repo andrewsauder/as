@@ -39,20 +39,22 @@ Write-Host "Running in directory "$PSScriptRoot\..\ -ForegroundColor Yellow
 Write-Host "git pull" -ForegroundColor Yellow
 git pull
 
-Write-Host "`nMost Recent Tags:" -ForegroundColor Yellow
-$recentTags = git tag --sort=version:refname | select -Last 5
+if($env -ne "local")
+{
+    Write-Host "`nMost Recent Tags:" -ForegroundColor Yellow
+    $recentTags = git tag --sort = version: refname | select -Last 5
 
-$tag = menu -object $recentTags -prompt 'Which tag do you want to check out?'
+    $tag = menu -object $recentTags -prompt 'Which tag do you want to check out?'
 
-Write-Host "git checkout tags/$tag" -ForegroundColor Yellow
-git checkout tags/$tag
+    Write-Host "git checkout tags/$tag" -ForegroundColor Yellow
+    git checkout tags/$tag
 
-Write-Host "git submodule sync" -ForegroundColor Yellow
-git submodule sync
+    Write-Host "git submodule sync" -ForegroundColor Yellow
+    git submodule sync
 
-Write-Host "git submodule update" -ForegroundColor Yellow
-git submodule update
-
+    Write-Host "git submodule update" -ForegroundColor Yellow
+    git submodule update
+}
 
 ##ENV
 if (Test-Path -Path "app/config/environment-$env.json" -PathType Leaf) {
