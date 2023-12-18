@@ -96,7 +96,7 @@ class email {
 
 	}
 
-	public static function send($to, $subject, $message, $from='', $replyTo='', $replyToName='') {
+	public static function send($to, $subject, $message, $from='', $replyTo='', $replyToName='', $cc=[]) {
 
 		if(trim($from)=='') {
 			$from = $_SESSION['AS']['config']['email']['from_address'];
@@ -136,6 +136,15 @@ class email {
 			elseif(is_array($to)) {
 				foreach($to as $addTo) {
 					self::$mailplugin->AddAddress($addTo);
+				}
+			}
+
+			if(is_string($cc)) {
+				self::$mailplugin->addCC($cc);
+			}
+			elseif(is_array($cc)) {
+				foreach($cc as $addCC) {
+					self::$mailplugin->addCC($addCC);
 				}
 			}
 
