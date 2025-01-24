@@ -112,6 +112,7 @@ class email {
 		if(isset($_SESSION['AS']['config']['email']['smtp'])) {
 			error_log('sending using config email settings');
 			self::$mailplugin->IsSMTP();
+			self::$mailplugin->Timeout = 15;
 			self::$mailplugin->SMTPAuth   = $_SESSION['AS']['config']['email']['smtp']['auth']=='true' ? true : false;  // enable SMTP authentication
 			self::$mailplugin->SMTPSecure = $_SESSION['AS']['config']['email']['smtp']['secure'];
 			self::$mailplugin->SMTPOptions = [
