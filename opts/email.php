@@ -96,7 +96,7 @@ class email {
 
 	}
 
-	public static function send($to, $subject, $message, $from='', $replyTo='', $replyToName='') {
+	public static function send($to, $subject, $message, $from='', $replyTo='', $replyToName='', $cc=[]) {
 
 		if(trim($from)=='') {
 			$from = $_SESSION['AS']['config']['email']['from_address'];
@@ -112,6 +112,7 @@ class email {
 		if(isset($_SESSION['AS']['config']['email']['smtp'])) {
 			error_log('sending using config email settings');
 			self::$mailplugin->IsSMTP();
+			self::$mailplugin->Timeout = 15;
 			self::$mailplugin->SMTPAuth   = $_SESSION['AS']['config']['email']['smtp']['auth']=='true' ? true : false;  // enable SMTP authentication
 			self::$mailplugin->SMTPSecure = $_SESSION['AS']['config']['email']['smtp']['secure'];
 			self::$mailplugin->SMTPOptions = [
@@ -136,6 +137,15 @@ class email {
 			elseif(is_array($to)) {
 				foreach($to as $addTo) {
 					self::$mailplugin->AddAddress($addTo);
+				}
+			}
+
+			if(is_string($cc)) {
+				self::$mailplugin->addCC($cc);
+			}
+			elseif(is_array($cc)) {
+				foreach($cc as $addCC) {
+					self::$mailplugin->addCC($addCC);
 				}
 			}
 

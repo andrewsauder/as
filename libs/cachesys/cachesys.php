@@ -9,7 +9,7 @@ class cacheSys {
      * Example Usage:
      * <code>
 	 *
-     * $htmlToDisplay = cacheSys::get('outputHTMLCategory', md5('filenameOutputKey'));
+     * $htmlToDisplay = cacheSys::get('outputHTMLCategory', self::sanitizeKey('filenameOutputKey'));
 	 *
 	 * if($htmlToDisplay===false) { //perform resource intensive logic here, eventually saving the output or data to the cache }
 	 *
@@ -30,7 +30,7 @@ class cacheSys {
 
 		$content = false;
 
-		$fileName = AS_ROOT_PATH.'/cache/'.$cacheName.'.'.$key.'.cache';
+		$fileName = AS_ROOT_PATH.'/cache/'.$cacheName.'.'.self::sanitizeKey($key).'.cache';
 
 		if($maxAge===false) {
 			if(file_exists($fileName)) {
@@ -56,7 +56,7 @@ class cacheSys {
      * Example Usage:
      * <code>
 	 *
-     * $htmlToDisplay = cacheSys::put('outputHTMLCategory', md5('filenameOutputKey'), 'content to store');
+     * $htmlToDisplay = cacheSys::put('outputHTMLCategory', self::sanitizeKey('filenameOutputKey'), 'content to store');
 	 *
 	 * if($htmlToDisplay===false) { //perform resource intensive logic here, eventually saving the output or data to the cache }
 	 *
@@ -75,7 +75,7 @@ class cacheSys {
 			error_log('Put output in cacheSys: '.$key);
 		}
 
-		$fileName = AS_ROOT_PATH.'/cache/'.$cacheName.'.'.$key.'.cache';
+		$fileName = AS_ROOT_PATH.'/cache/'.$cacheName.'.'.self::sanitizeKey($key).'.cache';
 
 		$cached = fopen($fileName, 'w');
 
@@ -135,7 +135,7 @@ class cacheSys {
      * Example Usage:
      * <code>
 	 *
-     * $cacheDeleted = cacheSys::deleteCachedItem('outputHTMLCategory', md5('filenameOutputKey'));
+     * $cacheDeleted = cacheSys::deleteCachedItem('outputHTMLCategory', self::sanitizeKey('filenameOutputKey'));
 	 *
      * </code>
      *
@@ -150,7 +150,7 @@ class cacheSys {
 			error_log('Delete cached item in cacheSys: '.$category.'.'.$key);
 		}
 
-		$fileName = AS_ROOT_PATH.'/cache/'.$category.'.'.$key.'.cache';
+		$fileName = AS_ROOT_PATH.'/cache/'.$category.'.'.self::sanitizeKey($key).'.cache';
 
 		if(file_exists($fileName)) {
 			unlink($fileName);
@@ -186,9 +186,11 @@ class cacheSys {
 
 		$cacheFiles = ls(AS_ROOT_PATH.'/cache/', true);
 
-		$search = $key;
 		if($key===null) {
 			$search = $category;
+		}
+		else {
+			$search = self::sanitizeKey($key);
 		}
 
 		foreach($cacheFiles as $file) {
@@ -256,14 +258,7 @@ class cacheSys {
      * @return string returns sanitized string
     */
 	public static function sanitizeKey( $dirtyString ) {
-
-		$a = str_replace('/', '~', trim($dirtyString,'/'));
-
-		$b = str_replace('?mobileok=true', '', $a);
-
-		$c = str_replace('?', '@', $b);
-
-		return $c;
+		return preg_replace("/[^A-Za-z0-9 .-]/", '', $dirtyString);
 
 	}
 
