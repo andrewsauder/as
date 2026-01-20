@@ -82,6 +82,7 @@ class db {
 
 			error_log('Query Failed: ' . $query);
 			error_log('Query Error Message: ' . $e->getMessage());
+			error_log($e);
 
 			$result = [];
 
@@ -139,6 +140,7 @@ class db {
 
 			error_log('Query Failed: ' . $query);
 			error_log('Query Error Message: ' . $e->getMessage());
+			error_log($e);
 
 			$result = [];
 
@@ -206,6 +208,7 @@ class db {
 
 			error_log('Query Failed: ' . $query);
 			error_log('Query Error Message: ' . $e->getMessage());
+			error_log($e);
 
 			if($className===null) {
 				$result = [];
@@ -262,6 +265,7 @@ class db {
 
 			error_log('Query Failed: ' . $query);
 			error_log('Query Error Message: ' . $e->getMessage());
+			error_log($e);
 
 			$result = false;
 
