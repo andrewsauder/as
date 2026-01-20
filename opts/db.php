@@ -391,7 +391,10 @@ class db {
 				if( $this->connect[ $key ][ 'pdodriver' ]=='sqlsrv' ) {
 					$this->pdo[ $key ] = new PDO("sqlsrv:Server=" . $this->connect[ $key ][ 'server' ] . ";Database=" . $this->connect[ $key ][ 'db' ].";TrustServerCertificate=1",
 					                             $this->connect[ $key ][ 'user' ],
-					                             $this->connect[ $key ][ 'pass' ]
+					                             $this->connect[ $key ][ 'pass' ],
+					                             [
+						                             PDO::SQLSRV_ATTR_ENCODING => PDO::SQLSRV_ENCODING_UTF8
+					                             ]
 					);
 				}
 
