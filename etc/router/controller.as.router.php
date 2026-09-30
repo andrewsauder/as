@@ -270,7 +270,8 @@ class ASrouterController {
 				header('Content-Type:application/json');
 			}
 			if(is_array($viewAndVars['data']) || is_object($viewAndVars['data'])) {
-				$d = json_encode($viewAndVars['data']);
+				//without json_header this goes out as text/html: hex-encode < > & ' " so stored text cannot become markup
+				$d = json_encode($viewAndVars['data'], JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT);
 			}
 			else {
 				$d = $viewAndVars['data'];
@@ -310,7 +311,7 @@ class ASrouterController {
 				include($viewToInclude);
 			}
 			if(isset($viewAndVars['js'])) {
-				echo '<script>window.'.$this->sid.' = '. json_encode($viewAndVars['js']).';</script>';
+				echo '<script>window.'.$this->sid.' = '. json_encode($viewAndVars['js'], JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT).';</script>';
 			}
 			$body = ob_get_contents();
 			ob_end_clean();
