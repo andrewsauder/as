@@ -110,7 +110,7 @@ class ASloader {
 		//CLEAN START
 			if(!isset($_SESSION['AS']) || isset($_GET['cleansession'])) {
 				$_SESSION['AS'] = [];
-				$_SESSION['AS']['config'] = getXMLAsArray(AS_VAR_PATH."config.xml");
+				$_SESSION['AS']['config'] = getConfigAsArray(AS_VAR_PATH);
 				foreach($_SESSION['AS']['config']['environment'] as $environment=>$opts) {
 					if(isset($opts['srv']['server_name'])) {
 						$_SESSION['AS']['config']['environment'][$environment]['srv'] = array($opts['srv']);

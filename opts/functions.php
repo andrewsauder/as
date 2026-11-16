@@ -566,3 +566,99 @@ function getProtocolFromUrl($url) {
 
 }
 
+/**
+ * Repeated config elements, matched between config.xml and config.local.xml by
+ * the child element that identifies them. Every other element merges by key.
+ */
+const AS_CONFIG_LIST_KEYS = [ 'srv' => 'server_name', 'db_connector' => 'db' ];
+
+/**
+ * Returns var/config.xml as an array, with var/config.local.xml merged over it
+ * when that file exists. Git does not track config.local.xml, so secrets live there.
+ */
+function getConfigAsArray( $varPath ) {
+	$config    = getXMLAsArray( $varPath . 'config.xml' );
+	$localPath = $varPath . 'config.local.xml';
+
+	if( !is_file( $localPath ) ) {
+		if( is_file( $varPath . 'config.local.example.xml' ) ) {
+			error_log( 'Config file "' . $localPath . '" does not exist. Copy config.local.example.xml to config.local.xml and fill in the secrets.' );
+		}
+		return $config;
+	}
+
+	$local = getXMLAsArrayQuietly( $localPath );
+	if( $local===null ) {
+		return $config;
+	}
+
+	return mergeConfigArrays( $config, $local );
+}
+
+/**
+ * Same array shape as getXMLAsArray(). Captures libxml errors, because the
+ * default warnings echo lines of the file, and this file holds secrets.
+ */
+function getXMLAsArrayQuietly( $src ) {
+	$previousUseErrors = libxml_use_internal_errors( true );
+	$xml               = simplexml_load_file( $src );
+	$errors            = libxml_get_errors();
+	libxml_clear_errors();
+	libxml_use_internal_errors( $previousUseErrors );
+
+	if( $xml===false ) {
+		error_log( 'Config file "' . $src . '" is not valid XML (first error on line ' . ( $errors[ 0 ]->line ?? 0 ) . ').' );
+		return null;
+	}
+	return json_decode( json_encode( $xml ), true );
+}
+
+function mergeConfigArrays( array $base, array $local ) {
+	foreach( $local as $key => $value ) {
+		//an empty element parses as an empty array; treat it as not set
+		if( $value===[] ) {
+			continue;
+		}
+		if( is_array( $value ) && isset( AS_CONFIG_LIST_KEYS[ $key ] ) ) {
+			$base[ $key ] = mergeConfigList( $base[ $key ] ?? [], $value, $key, AS_CONFIG_LIST_KEYS[ $key ] );
+		}
+		elseif( is_array( $value ) && isset( $base[ $key ] ) && is_array( $base[ $key ] ) ) {
+			$base[ $key ] = mergeConfigArrays( $base[ $key ], $value );
+		}
+		else {
+			$base[ $key ] = $value;
+		}
+	}
+	return $base;
+}
+
+function mergeConfigList( array $baseItems, array $localItems, $key, $idKey ) {
+	$baseItems = configAsList( $baseItems );
+	foreach( configAsList( $localItems ) as $localItem ) {
+		$id    = $localItem[ $idKey ] ?? null;
+		$match = null;
+		foreach( $baseItems as $i => $baseItem ) {
+			if( is_string( $id ) && ( $baseItem[ $idKey ] ?? null )===$id ) {
+				$match = $i;
+				break;
+			}
+		}
+		if( $match===null ) {
+			error_log( 'config.local.xml: no <' . $key . '> in config.xml has <' . $idKey . '>' . ( is_string( $id ) ? $id : '' ) . '</' . $idKey . '>; entry skipped.' );
+			continue;
+		}
+		$baseItems[ $match ] = mergeConfigArrays( $baseItems[ $match ], $localItem );
+	}
+	return $baseItems;
+}
+
+/**
+ * XML-to-array turns one element into an associative array and repeated
+ * elements into a list. Returns a list either way.
+ */
+function configAsList( array $value ) {
+	if( $value===[] ) {
+		return [];
+	}
+	return array_keys( $value )===range( 0, count( $value ) - 1 ) ? $value : [ $value ];
+}

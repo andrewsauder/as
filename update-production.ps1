@@ -31,6 +31,15 @@ function Menu ($object, $prompt) {
 }
 
 Push-Location $PSScriptRoot\..\
+
+##CONFIG.LOCAL.XML
+#an app that ships var/config.local.example.xml keeps its secrets in the untracked var/config.local.xml
+if ((Test-Path -Path "var/config.local.example.xml" -PathType Leaf) -and -not (Test-Path -Path "var/config.local.xml" -PathType Leaf)) {
+    Write-Host "var/config.local.xml is missing. Copy var/config.local.example.xml to var/config.local.xml, fill in the secrets for this server, and run this script again." -ForegroundColor Red
+    Pop-Location
+    exit 1
+}
+
 Write-Host "Environment: "$env -ForegroundColor Red
 
 Write-Host "Running in directory "$PSScriptRoot\..\ -ForegroundColor Yellow
