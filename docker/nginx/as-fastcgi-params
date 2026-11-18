@@ -1,0 +1,34 @@
+# The FastCGI parameters of an AS application. They replace the nginx image's
+# fastcgi_params rather than add to it, so each parameter is sent once.
+#
+# REQUEST_URI is the path the browser asked for, base path included, as on IIS. AS keys its
+# output cache on it. QUERY_STRING carries R0 from the rewrite, and then the request's own
+# query string.
+
+fastcgi_param  QUERY_STRING       $query_string;
+fastcgi_param  REQUEST_METHOD     $request_method;
+fastcgi_param  CONTENT_TYPE       $content_type;
+fastcgi_param  CONTENT_LENGTH     $content_length;
+
+fastcgi_param  REQUEST_URI        $request_uri;
+fastcgi_param  DOCUMENT_URI       $document_uri;
+fastcgi_param  DOCUMENT_ROOT      /var/www/app/www;
+fastcgi_param  SERVER_PROTOCOL    $server_protocol;
+fastcgi_param  REQUEST_SCHEME     $as_request_scheme;
+fastcgi_param  HTTPS              $as_https if_not_empty;
+
+fastcgi_param  GATEWAY_INTERFACE  CGI/1.1;
+fastcgi_param  SERVER_SOFTWARE    nginx;
+
+fastcgi_param  REMOTE_ADDR        $remote_addr;
+fastcgi_param  REMOTE_PORT        $remote_port;
+fastcgi_param  SERVER_ADDR        $server_addr;
+fastcgi_param  SERVER_PORT        $as_server_port;
+# The request's host name, not nginx's server_name, which is _ here.
+fastcgi_param  SERVER_NAME        $host;
+
+fastcgi_param  REDIRECT_STATUS    200;
+
+# A client's Proxy header would otherwise reach PHP as HTTP_PROXY, which some HTTP
+# libraries read as their outbound proxy.
+fastcgi_param  HTTP_PROXY         "";

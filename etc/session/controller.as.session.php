@@ -32,7 +32,16 @@ class ASsessionController {
 
 			$activeEnvironment = '';
 
-			foreach($_SESSION['AS']['config']['environment'] as $environment=>$opts) {
+			//AS_ENVIRONMENT names the one environment this server may run. Without it, any
+			//environment whose <srv> matches the host is used, and a host that matches none
+			//runs in local testing mode, which some templates answer with the whole session.
+			$requiredEnvironment = getASEnvironmentValue('AS_ENVIRONMENT');
+			$environments = $_SESSION['AS']['config']['environment'];
+			if($requiredEnvironment!==null) {
+				$environments = isset($environments[$requiredEnvironment]) && is_array($environments[$requiredEnvironment]) ? [ $requiredEnvironment=>$environments[$requiredEnvironment] ] : [];
+			}
+
+			foreach($environments as $environment=>$opts) {
 
 				if(!isset($opts['srv'])) {
 					continue;
@@ -122,6 +131,10 @@ class ASsessionController {
 
 			}
 
+			if($requiredEnvironment!==null && $activeEnvironment==='') {
+				self::refuseUnknownHost($host, $requiredEnvironment);
+			}
+
 			$_SESSION[ AS_APP ]['cli'] = php_sapi_name()=='cli';
 
 			if($activeEnvironment=='local') {
@@ -146,6 +159,30 @@ class ASsessionController {
 			}
 
 		}
+	}
+
+	/**
+	 * Stops a request for a host that the environment in AS_ENVIRONMENT does not list.
+	 * The application session is removed, so the next request checks the host again.
+	 */
+	private static function refuseUnknownHost( $host, $environment ) {
+		$safeHost = preg_replace('/[^a-z0-9.*_-]/', '?', $host);
+		$message = 'AS_ENVIRONMENT is "'.$environment.'", and no <srv> under <environment><'.$environment.'> in var/config.xml has <server_name>'.$safeHost.'</server_name>. Request refused.';
+		error_log($message);
+
+		unset($_SESSION[ AS_APP ]);
+
+		if(php_sapi_name()=='cli') {
+			fwrite(STDERR, $message.PHP_EOL);
+			exit(1);
+		}
+
+		if(!headers_sent()) {
+			http_response_code(421);
+			header('Content-Type: text/plain; charset=utf-8');
+		}
+		echo 'Misdirected Request';
+		exit;
 	}
 
 	public static function setASVar() {

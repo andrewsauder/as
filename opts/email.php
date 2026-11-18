@@ -96,6 +96,16 @@ class email {
 
 	}
 
+	private static function smtpOptions() {
+		return [
+			'ssl'=>[
+					'verify_peer' => false,
+					'verify_peer_name' => false,
+					'allow_self_signed' => true
+			]
+		];
+	}
+
 	public static function send($to, $subject, $message, $from='', $replyTo='', $replyToName='', $cc=[]) {
 
 		if(trim($from)=='') {
@@ -115,19 +125,25 @@ class email {
 			self::$mailplugin->Timeout = 15;
 			self::$mailplugin->SMTPAuth   = $_SESSION['AS']['config']['email']['smtp']['auth']=='true' ? true : false;  // enable SMTP authentication
 			self::$mailplugin->SMTPSecure = $_SESSION['AS']['config']['email']['smtp']['secure'];
-			self::$mailplugin->SMTPOptions = [
-				'ssl'=>[
-						'verify_peer' => false,
-						'verify_peer_name' => false,
-						'allow_self_signed' => true
-				]
-			];
+			self::$mailplugin->SMTPOptions = self::smtpOptions();
 			self::$mailplugin->Host       = $_SESSION['AS']['config']['email']['smtp']['host'];							// sets the SMTP server
 			self::$mailplugin->Port       = $_SESSION['AS']['config']['email']['smtp']['port'];							// set the SMTP port for the GMAIL server
 			if($_SESSION['AS']['config']['email']['smtp']['auth']=='true') {
 				self::$mailplugin->Username   = $_SESSION['AS']['config']['email']['smtp']['username'];						// SMTP account username
 				self::$mailplugin->Password   = $_SESSION['AS']['config']['email']['smtp']['password'];						// SMTP account password
 			}
+		}
+		//without <smtp> in config.xml, PHPMailer calls mail(). On Windows mail() sends through
+		//the SMTP host in php.ini. On Linux it needs a sendmail binary, which the container
+		//image does not have, so a container names an unauthenticated relay here instead.
+		elseif(getASEnvironmentValue('AS_SMTP_HOST')!==null) {
+			$port = getASEnvironmentValue('AS_SMTP_PORT');
+			self::$mailplugin->IsSMTP();
+			self::$mailplugin->Timeout     = 15;
+			self::$mailplugin->SMTPAuth    = false;
+			self::$mailplugin->SMTPOptions = self::smtpOptions();
+			self::$mailplugin->Host        = getASEnvironmentValue('AS_SMTP_HOST');
+			self::$mailplugin->Port        = ($port!==null && ctype_digit($port)) ? (int) $port : 25;
 		}
 
 		try {

@@ -1,0 +1,109 @@
+# An example gcgov/deploy entry for an AS application: zones/<zone>/apps/<app>/compose.yaml.
+#
+# It follows gcgov/deploy's api template, templates/framework-app-template/compose.yaml,
+# and passes the same checks: tests/compose-isolation.sh and tests/compose-logging.sh.
+# That template explains the security and logging blocks line by line. This file explains
+# what is different for AS. Replace as-app-template with the application's slug
+# everywhere, and /template with its path.
+#
+# Build the images with gcgov/deploy's build.yml and `kind: api`. The Release has the
+# same two images as a gcgov/framework api, php and nginx.
+
+name: as-app-template
+
+x-common: &common
+  restart: unless-stopped
+  security_opt:
+    - no-new-privileges:true
+  cap_drop:
+    - ALL
+  cap_add:
+    - CHOWN
+    - DAC_OVERRIDE
+    - FOWNER
+    - KILL
+    - NET_BIND_SERVICE
+    - SETGID
+    - SETUID
+  networks:
+    - gcgov
+  logging:
+    driver: journald
+    options:
+      tag: "{{.Name}}"
+
+services:
+  php:
+    <<: *common
+    # The stack's private network only. Port 9000 speaks FastCGI, which has no
+    # authentication.
+    networks:
+      - backend
+    image: ghcr.io/gcgov/as-app-template/php@${PHP_IMAGE_DIGEST:?written by bin/deploy}
+    # The image runs 8 FPM workers with a 256M memory_limit each. Change the two together.
+    mem_limit: 3g
+    environment:
+      # The <environment> in var/config.xml this server runs. AS matches the request's host
+      # name only against that environment's <srv> entries and refuses any other host.
+      # Without it, a host that matches no <srv> runs in local testing mode.
+      AS_ENVIRONMENT: prod
+      # The session cookie name. Every AS application on one host name needs its own,
+      # because the cookie path is /. Letters and digits only.
+      AS_SESSION_NAME: asapptemplate
+      # The application's var/config.local.xml, provisioned from secrets.sops.yaml under
+      # the key config.local.xml. AS merges it over var/config.xml. A missing, unreadable
+      # or invalid file stops every request, and the health check fails.
+      AS_CONFIG_LOCAL_FILE: /run/secrets/as-app-template/config.local.xml
+      # Only for an application that sends mail with no <email><smtp> in var/config.xml.
+      # On IIS, PHP's mail() sent it through the SMTP host in php.ini. Linux has no such
+      # setting, so AS sends it to this relay over SMTP, without a password.
+      AS_SMTP_HOST: smtp-relay.example.test
+      AS_SMTP_PORT: "25"
+    volumes:
+      - /etc/gcgov/secrets/as-app-template:/run/secrets/as-app-template:ro
+      # A directory the application writes and nginx serves, such as www/receipts, is a
+      # named volume in both services, at the same path. List it in AS_WRITABLE_DIRS in
+      # the application's Dockerfile, so the php container can write to it.
+      # - receipts:/var/www/app/www/receipts
+    expose:
+      - "9000"
+
+  nginx:
+    <<: *common
+    networks:
+      - gcgov
+      - backend
+    image: ghcr.io/gcgov/as-app-template/nginx@${NGINX_IMAGE_DIGEST:?written by bin/deploy}
+    mem_limit: 256m
+    depends_on:
+      php:
+        condition: service_started
+    environment:
+      PHP_FPM_HOST: php:9000
+      # The path the application answers under, the same path as <base_url> in
+      # var/config.xml. Leave it empty for an application at the root of its own host name.
+      AS_BASE_PATH: /template
+    # volumes:
+    #   - receipts:/var/www/app/www/receipts:ro
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=gcgov
+      # The host name must be a <server_name> in the <srv> entries of AS_ENVIRONMENT.
+      # Path and PathPrefix together, because PathPrefix(`/template`) alone also matches
+      # /templates. /healthz is outside the path, so the internet never reaches it.
+      - traefik.http.routers.as-app-template.rule=Host(`apps.${ZONE_DOMAIN:?set in zone.env}`) && (Path(`/template`) || PathPrefix(`/template/`))
+      - traefik.http.routers.as-app-template.entrypoints=websecure
+      - traefik.http.routers.as-app-template.tls.certresolver=letsencrypt
+      - traefik.http.services.as-app-template.loadbalancer.server.port=80
+      # AS/bin/health.php: configuration, secrets file, session name, writable directories.
+      # It does no network I/O, so a database outage does not take the application out.
+      - traefik.http.services.as-app-template.loadbalancer.healthcheck.path=/healthz
+      - traefik.http.services.as-app-template.loadbalancer.healthcheck.interval=15s
+
+networks:
+  gcgov:
+    external: true
+  backend: {}
+
+# volumes:
+#   receipts: {}

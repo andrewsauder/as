@@ -383,12 +383,45 @@ class tools {
 
 	public static function createCron( $script, $dataString='' ) {
 
+		if(PHP_OS_FAMILY!=='Windows') {
+			return self::createCronPosix( $script, $dataString );
+		}
+
 		$bat = $_SESSION[AS_APP]['environment']['phppath'].' -f "'.$_SESSION[AS_APP]['environment']['cronpath'].$script.'.php" '.$_SESSION[AS_APP]['environment']['cli_server_name'].' '.$dataString;
 		$bat .= "\n exit";
 
 		file_put_contents($_SESSION[AS_APP]['environment']['tmppath'].$script.'.bat', $bat);
 
 		pclose(popen('start /B '. $_SESSION[AS_APP]['environment']['tmppath'].$script.'.bat 2>&1 >nul', "r"));
+
+		return true;
+
+	}
+
+	/**
+	 * createCron for Linux, such as the container image: starts the same command in the
+	 * background, without a .bat file. phppath is the command from config.xml, for example
+	 * /usr/local/bin/php, and is used as written. The script path, the server name and each
+	 * space-separated word of $dataString are quoted, so none of them can add a command.
+	 */
+	private static function createCronPosix( $script, $dataString ) {
+
+		$environment = $_SESSION[AS_APP]['environment'];
+
+		$args = [ escapeshellarg( $environment['cronpath'].$script.'.php' ), escapeshellarg( $environment['cli_server_name'] ) ];
+		foreach( preg_split( '/\s+/', trim( (string) $dataString ), -1, PREG_SPLIT_NO_EMPTY ) as $word ) {
+			$args[] = escapeshellarg( $word );
+		}
+
+		//stdout must not stay on exec()'s pipe, or exec() waits for the job to end. stderr
+		//stays open, so the job's errors reach the same log as the request that started it.
+		$command = $environment['phppath'].' -f '.implode( ' ', $args ).' > /dev/null &';
+		exec( $command, $output, $status );
+
+		if( $status!==0 ) {
+			error_log( 'createCron could not start '.$script.' (shell exit status '.$status.').' );
+			return false;
+		}
 
 		return true;
 
