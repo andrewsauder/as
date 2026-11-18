@@ -1,0 +1,30 @@
+# Copy this file to the root of the AS application as `.dockerignore`.
+#
+# Docker reads .dockerignore only from the root of the build context, so this copy does
+# nothing where it is.
+
+# Secrets. build-release.sh also refuses a build context that holds this file.
+var/config.local.xml
+
+# Version control and editor files
+.git
+**/.git
+.github
+.idea
+.vscode
+nbproject
+
+# Files the application writes while it runs, and IIS-only files
+cache/*
+var/tmp/*
+var/srv/tmp
+var/srv/logs
+logs/*
+AS/bin/*.as
+www/web.config
+version.json
+
+# Local environment files
+.env
+.env.*
+docker-compose*.yml

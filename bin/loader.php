@@ -34,25 +34,45 @@ class ASloader {
 	private function startSession() {
 
 		if (session_status() == PHP_SESSION_NONE) {
-			$host = isset($_SERVER['SERVER_NAME']) ? strtolower($_SERVER['SERVER_NAME']) : 'cli';
-			$sessionFile = AS__PATH.'/bin/session-name.'.$host.'.as';
-			if(file_exists($sessionFile)) {
-				$sessionName = file_get_contents($sessionFile);
-			}
-			else {
-				$char_list = "ABCDEFGHIJKLMNPQRSTUVWXYZabcdefghijklmnpqrstuvwxyz123456789";
-				$random = '';
-				for($i = 0; $i < 50; $i++) {
-					$random .= substr($char_list, (rand() % (strlen($char_list))), 1);
-				}
-				$sessionName = $random;
-				file_put_contents($sessionFile, $sessionName);
-			}
-
-			session_name($sessionName);
+			session_name($this->getSessionName());
 			session_start();
 		}
 
+	}
+
+	/**
+	 * AS_SESSION_NAME wins when it is set. Otherwise the name comes from a file under
+	 * AS/bin/, one per host name, which AS creates with a random name on first use.
+	 */
+	private function getSessionName() {
+		include_once(AS__PATH.'/opts/functions.php');
+
+		$fromEnvironment = getSessionNameFromEnvironment();
+		if($fromEnvironment!==null) {
+			return $fromEnvironment;
+		}
+
+		$host = isset($_SERVER['SERVER_NAME']) ? strtolower($_SERVER['SERVER_NAME']) : 'cli';
+		$sessionFile = AS__PATH.'/bin/session-name.'.$host.'.as';
+		if(file_exists($sessionFile)) {
+			return file_get_contents($sessionFile);
+		}
+
+		$char_list = "ABCDEFGHIJKLMNPQRSTUVWXYZabcdefghijklmnpqrstuvwxyz123456789";
+		$random = '';
+		for($i = 0; $i < 50; $i++) {
+			$random .= substr($char_list, (rand() % (strlen($char_list))), 1);
+		}
+
+		if(@file_put_contents($sessionFile, $random)!==false) {
+			return $random;
+		}
+
+		//a random name that is never saved changes on every request, and no session survives it.
+		//use a stable name instead. Every application installed at the same path on this host
+		//gets the same name, so their sessions collide: set AS_SESSION_NAME.
+		error_log('Cannot write the session name file "'.$sessionFile.'". Set AS_SESSION_NAME to a name unique to this application.');
+		return 'AS'.substr(hash('sha256', $host.'|'.AS__PATH), 0, 40);
 	}
 
 	private function getRequiredFiles() {

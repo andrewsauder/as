@@ -573,26 +573,97 @@ function getProtocolFromUrl($url) {
 const AS_CONFIG_LIST_KEYS = [ 'srv' => 'server_name', 'db_connector' => 'db' ];
 
 /**
- * Returns var/config.xml as an array, with var/config.local.xml merged over it
+ * Returns the value of an environment variable, or null when it is unset or empty.
+ * An empty value counts as unset, so a compose line such as `AS_SESSION_NAME: ""`
+ * cannot switch a setting on by accident.
+ */
+function getASEnvironmentValue( $name ) {
+	$value = getenv( $name );
+	if( !is_string( $value ) || $value==='' ) {
+		return null;
+	}
+	return $value;
+}
+
+/**
+ * Returns the path of the local config file: the file AS_CONFIG_LOCAL_FILE names,
+ * or var/config.local.xml when that variable is unset.
+ *
+ * In a container the secrets are a file that gcgov/deploy provisions to the host and
+ * mounts read-only, such as /run/secrets/<app>/config.local.xml. The image never holds them.
+ */
+function getConfigLocalPath( $varPath ) {
+	$fromEnvironment = getASEnvironmentValue( 'AS_CONFIG_LOCAL_FILE' );
+	if( $fromEnvironment!==null ) {
+		return $fromEnvironment;
+	}
+	return $varPath . 'config.local.xml';
+}
+
+/**
+ * Returns var/config.xml as an array, with the local config file merged over it
  * when that file exists. Git does not track config.local.xml, so secrets live there.
+ *
+ * When AS_CONFIG_LOCAL_FILE names the file, the file is required. A missing, unreadable
+ * or invalid file throws instead of running the application without its secrets. The
+ * exception message names the path and never a value.
+ *
+ * @throws \RuntimeException
  */
 function getConfigAsArray( $varPath ) {
 	$config    = getXMLAsArray( $varPath . 'config.xml' );
-	$localPath = $varPath . 'config.local.xml';
+	$localPath = getConfigLocalPath( $varPath );
+	$required  = getASEnvironmentValue( 'AS_CONFIG_LOCAL_FILE' )!==null;
 
 	if( !is_file( $localPath ) ) {
+		if( $required ) {
+			throw new \RuntimeException( 'AS_CONFIG_LOCAL_FILE names "' . $localPath . '", which does not exist. Provision the secrets file, or unset AS_CONFIG_LOCAL_FILE.' );
+		}
 		if( is_file( $varPath . 'config.local.example.xml' ) ) {
 			error_log( 'Config file "' . $localPath . '" does not exist. Copy config.local.example.xml to config.local.xml and fill in the secrets.' );
 		}
 		return $config;
 	}
 
+	if( $required && !is_readable( $localPath ) ) {
+		throw new \RuntimeException( 'AS_CONFIG_LOCAL_FILE names "' . $localPath . '", which this process cannot read. Check that the file is in the group the application runs as.' );
+	}
+
 	$local = getXMLAsArrayQuietly( $localPath );
 	if( $local===null ) {
+		if( $required ) {
+			throw new \RuntimeException( 'AS_CONFIG_LOCAL_FILE names "' . $localPath . '", which is not valid XML.' );
+		}
 		return $config;
 	}
 
 	return mergeConfigArrays( $config, $local );
+}
+
+/**
+ * Returns the session name AS_SESSION_NAME sets, or null when it is unset or invalid.
+ *
+ * Every AS application on one host name needs its own session name, because the
+ * session cookie path is /. A container cannot write the session name file under
+ * AS/bin/, so a container sets the name here instead.
+ */
+function getSessionNameFromEnvironment() {
+	$name = getASEnvironmentValue( 'AS_SESSION_NAME' );
+	if( $name===null ) {
+		return null;
+	}
+	if( !isValidSessionName( $name ) ) {
+		error_log( 'AS_SESSION_NAME is not a valid session name and is ignored. Use 1 to 64 letters and digits, with at least one letter.' );
+		return null;
+	}
+	return $name;
+}
+
+/**
+ * PHP accepts a session name of letters and digits that is not all digits.
+ */
+function isValidSessionName( $name ) {
+	return is_string( $name ) && preg_match( '/^(?=.*[A-Za-z])[A-Za-z0-9]{1,64}$/', $name )===1;
 }
 
 /**

@@ -1,0 +1,84 @@
+# The nginx site of an AS application.
+#
+# 40-as-render-config.sh renders this file to /etc/nginx/conf.d/default.conf at container
+# start. It replaces four placeholders: PHP_FPM_HOST, AS_BASE_PATH, AS_BASE_PATH_RE and
+# AS_BASE_LOCATIONS, each written as a dollar sign and the name in braces. Every other
+# dollar sign starts an nginx variable. Never write a placeholder in a comment here: a
+# value that spans lines would end the comment.
+#
+# It does what the IIS web.config of an AS application does:
+#   1. HTTPS        Traefik ends TLS. PHP sees HTTPS=on and port 443 from X-Forwarded-Proto,
+#                   as it did on IIS, so getFullURL() builds the same URLs.
+#   2. host name    PHP sees the request's host as SERVER_NAME, which AS matches against
+#                   each <srv><server_name> in var/config.xml.
+#   3. static files Files under www/ are served as they are.
+#   4. front door   Every other path goes to index.php as R0, which ASloader splits into
+#                   R1, R2 and so on. The path is relative to AS_BASE_PATH.
+#
+# One thing IIS did not do: /healthz runs AS/bin/health.php.
+
+map $http_x_forwarded_proto $as_https {
+    default "";
+    https   on;
+}
+map $http_x_forwarded_proto $as_server_port {
+    default $server_port;
+    https   443;
+}
+map $http_x_forwarded_proto $as_request_scheme {
+    default $scheme;
+    https   https;
+}
+
+server {
+    listen 80;
+    server_name _;
+
+    root /var/www/app/www;
+
+    server_tokens off;
+    # Redirects carry a path only. nginx listens on plain port 80 behind Traefik, so an
+    # absolute redirect would name the wrong scheme and port.
+    absolute_redirect off;
+
+    client_max_body_size 1024m;
+
+    location = /healthz {
+        access_log off;
+        include /etc/nginx/as-fastcgi-params;
+        fastcgi_pass ${PHP_FPM_HOST};
+        fastcgi_param SCRIPT_FILENAME /var/www/app/AS/bin/health.php;
+        fastcgi_param SCRIPT_NAME /healthz;
+    }
+
+    # The only PHP file nginx runs. Theme templates and the rest are included by AS.
+    location = /index.php {
+        include /etc/nginx/as-fastcgi-params;
+        fastcgi_pass ${PHP_FPM_HOST};
+        fastcgi_param SCRIPT_FILENAME /var/www/app/www/index.php;
+        fastcgi_param SCRIPT_NAME ${AS_BASE_PATH}/index.php;
+        fastcgi_read_timeout 300;
+    }
+
+    # The application's home page.
+    location = ${AS_BASE_PATH}/ {
+        rewrite ^ /index.php last;
+    }
+
+    location ^~ ${AS_BASE_PATH}/ {
+        alias /var/www/app/www/;
+
+        # Never sent as a file: PHP source, IIS and PowerShell files, and dot files. They
+        # go to the application, which answers with its own 404, as IIS sent them there.
+        location ~ (\.(php|phtml|inc|config|ps1|bat|cmd|ini|log|sql)$|/\.) {
+            rewrite ^${AS_BASE_PATH_RE}/(.*)$ /index.php?R0=$1 last;
+        }
+
+        try_files $uri @as;
+    }
+
+    location @as {
+        rewrite ^${AS_BASE_PATH_RE}/(.*)$ /index.php?R0=$1 last;
+    }
+${AS_BASE_LOCATIONS}
+}
